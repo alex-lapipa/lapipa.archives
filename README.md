@@ -1,2 +1,44 @@
-# lapipa.archives
-lapipa archives 
+# La Pipa Archives
+
+The version-controlled implementation for the La Pipa archive, knowledge base, provenance graph, and RAG system.
+
+## Platform responsibilities
+
+- **Notion:** official editorial knowledge base and review workflow.
+- **GitHub:** migrations, data contracts, functions, documentation, and release history.
+- **Supabase:** private structured records, Storage, provenance, graph relationships, hybrid retrieval, and audit data.
+- **Vercel:** internal archive entry point and authenticated search proxy. Voyage credentials remain in Supabase only.
+
+## Supabase
+
+Target project: `jxilnxchvdeiazmopslf` (`LA PIPA ARCHIVE`).
+
+The migrations create private `kb`, `kg`, `rag`, `ops`, and `private` schemas; three private Storage buckets; row-level security; a relational knowledge graph; Voyage-compatible 1,024-dimensional embeddings; hybrid full-text/vector search; evaluation records; and ingestion governance.
+
+Edge Functions:
+
+- `kb-search`: authenticated Voyage query embedding plus hybrid retrieval.
+- `kb-embed`: owner/editor-only contextual embedding of approved chunks.
+
+`VOYAGE_API_KEY` is a server-side Supabase secret. Never copy it into Vercel, a browser, GitHub, Notion, or logs.
+
+## Local checks
+
+```sh
+npm run check
+npm run build
+supabase functions serve kb-search --env-file .env.local
+```
+
+Use `.env.example` as the list of required Vercel configuration names. The Vercel proxy needs only the Supabase project URL; it forwards the caller's short-lived access token and does not hold a Supabase API key. Local secret values belong only in ignored `.env.*.local` files.
+
+## Deployment sequence
+
+1. Review and apply migrations in timestamp order.
+2. Run Supabase security and performance advisors.
+3. Deploy authenticated Edge Functions with JWT verification enabled.
+4. Configure Vercel `SUPABASE_URL` per environment.
+5. Deploy and verify a Vercel preview.
+6. Promote only after authentication, RLS, retrieval, and citation checks pass.
+
+See [docs/architecture.md](docs/architecture.md) and [docs/operations.md](docs/operations.md).
