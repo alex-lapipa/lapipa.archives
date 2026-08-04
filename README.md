@@ -13,7 +13,7 @@ The version-controlled implementation for the La Pipa archive, knowledge base, p
 
 Target project: `jxilnxchvdeiazmopslf` (`LA PIPA ARCHIVE`).
 
-The migrations create private `kb`, `kg`, `rag`, `ops`, and `private` schemas; three private Storage buckets; row-level security; a relational knowledge graph; Voyage-compatible 1,024-dimensional embeddings; hybrid full-text/vector search; evaluation records; and ingestion governance.
+The migrations create private `archive`, `kb`, `kg`, `rag`, `ops`, and `private` schemas; preservation and access Storage buckets; row-level security; a relational knowledge graph; Voyage-compatible 1,024-dimensional embeddings; hybrid full-text/vector search; evaluation records; and ingestion governance. The documentary layer covers archival hierarchy, intellectual items, representations, file objects, audiovisual tracks, transcripts, rights, preservation events, fixity, accessions, and custody.
 
 Edge Functions:
 
@@ -41,4 +41,4 @@ Use `.env.example` as the list of required Vercel configuration names. The Verce
 5. Deploy and verify a Vercel preview.
 6. Promote only after authentication, RLS, retrieval, and citation checks pass.
 
-See [docs/architecture.md](docs/architecture.md) and [docs/operations.md](docs/operations.md).
+See [docs/architecture.md](docs/architecture.md), [docs/operations.md](docs/operations.md), and the [Documentary Archive handbook](docs/archive/README.md).

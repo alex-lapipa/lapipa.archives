@@ -23,6 +23,13 @@ The first owner must be added by an authorized database administrator after that
 - `source-originals`: immutable, hash-addressed originals.
 - `source-derivatives`: OCR, transcripts, renders, and previews.
 - `knowledge-exports`: manifests, Markdown/JSONL, checksums, evaluations, and releases.
+- `preservation-masters`: managed high-fidelity representations and preservation packages.
+- `access-media`: rights-cleared streaming and research derivatives.
 
 Object paths begin `la-pipa/`. Database records preserve bucket, object path, MIME type, byte count, SHA-256, processor version, and provenance.
 
+## Documentary archive layer
+
+The private `archive` schema implements LP-MAP 1.0. It separates collection hierarchy, intellectual items, representations, files, audiovisual essence tracks, transcripts, rights statements, preservation events, fixity checks, accessions, and custody events. Links to `kb.sources` and `kb.entities` keep archival description connected to the existing provenance graph without treating generated knowledge records as replacements for original objects.
+
+The model is aligned to PREMIS 3.0 and PBCore 2.1, with future IIIF Presentation 3.0 exports. This is an application profile and preservation foundation, not a claim of repository certification.
