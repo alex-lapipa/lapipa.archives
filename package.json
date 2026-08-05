@@ -1,0 +1,16 @@
+{
+  "name": "lapipa-archives",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": "24.x" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check api/health.mjs && node --check api/search.mjs && node --check scripts/build.mjs && node --check scripts/validate-repository.mjs && node --check scripts/archive/lib.mjs && node --check scripts/archive/inventory-accession.mjs && node --check scripts/archive/create-bag.mjs && node --check scripts/archive/validate-bag.mjs",
+    "test": "node --test",
+    "validate": "node scripts/validate-repository.mjs",
+    "archive:inventory": "node scripts/archive/inventory-accession.mjs",
+    "archive:create-bag": "node scripts/archive/create-bag.mjs",
+    "archive:validate-bag": "node scripts/archive/validate-bag.mjs",
+    "vercel-build": "npm run build"
+  }
+}

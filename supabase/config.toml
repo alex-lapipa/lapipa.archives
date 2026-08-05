@@ -1,0 +1,8 @@
+project_id = "jxilnxchvdeiazmopslf"
+
+[functions.kb-search]
+verify_jwt = true
+
+[functions.kb-embed]
+verify_jwt = true
+
