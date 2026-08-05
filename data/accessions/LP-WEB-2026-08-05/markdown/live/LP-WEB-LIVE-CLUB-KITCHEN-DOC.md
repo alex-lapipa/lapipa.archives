@@ -1,0 +1,23 @@
+---
+document_id: "LP-WEB-LIVE-CLUB-KITCHEN-DOC"
+source_id: "LP-WEB-LIVE-CLUB-KITCHEN"
+title: "Kitchen Club — LA PIPA"
+language: "en"
+document_type: "website_page"
+origin_uri: "https://www.lapipa.io/club/kitchen"
+verification_status: "captured_public_claim"
+access_scope: "public"
+content_sha256: "de72d1ecfe92a85198ac2c7cf232267f5eb326fe1eb6cc396e32b0f0f76f6f5a"
+---
+
+# Kitchen Club — LA PIPA
+
+Archive source LP-WEB-LIVE-CLUB-KITCHEN. Kitchen Club — LA PIPA.
+
+Captured public page: https://www.lapipa.io/club/kitchen
+
+Capture timestamp: 2026-08-05T01:12:09.423Z
+
+Page description: Food, permaculture, and creative collaboration at LA PIPA. Farm-to-table experiences, chef residencies, and community gatherings in Asturias.
+
+La Pipa Kitchen ClubA place where we share food, cook together, and surprise each other with guest chefs. But the real conversation? That's about everything else happening at La Pipa.We're just getting started here, step by step. Kitchen Club isn't really about food—it's about using food as an excuse to gather, to sit around a table, and talk about what actually matters. The projects we're building, the ideas taking shape, the questions we're wrestling with.We're learning to grow what we cook. Our permaculture gardens are still young, but they're starting to supply the kitchen. Each meal is becoming a story about this land, this season, and the people learning to work it. Soil to plate in steps, not miles.We're inspired by places like Stone Barns Center, where chefs and farmers collaborate, and Outstanding in the Field, where meals become adventures. But we're figuring out our own version—messier, more spontaneous, completely real.This is where collaboration starts to happen. Not in conference rooms, but around a table, with simple food, honest conversation, and people from different worlds—chefs, artists, technologists, farmers, thinkers—beginning to share what they know.What happens herePop-up dining experiencesFrom harvest dinners in our permaculture gardens to surprise chef collaborations—each event is one-of-a-kind. We grow what we cook, connecting you directly to where your food comes from.Hands-on workshopsLearn by doing. Bread baking, fermenting, foraging, seed-saving, composting—practical skills for a more self-sufficient life. Sometimes with master chefs, sometimes with local grandmothers.Community gatheringsOpen tables where locals and visitors mix. Food brings us together, but we talk about everything else—projects, ideas, sustainability, technology, art, and life.How we think about foodFarm meets table. We maintain edible landscapes—forest gardens, herb spirals, seasonal plots—that feed our kitchen and teach permaculture principles. It's a living classroom where you can see, touch, and taste sustainability.Learning by doing. Workshops aren't lectures. They're experiences. Plant seeds, ferment vegetables, forage wild herbs, bake sourdough. Walk away with skills and stories, not just recipes.Collaboration over competition. Our chef residencies bring in talent from around the world to work with local producers, experiment with Asturian ingredients, and share discoveries with our community. Fresh perspectives, deep roots.Everything connects. Music, film, food, photography, media, permaculture, open source, marketing—everything we explore at La Pipa finds its way to the table. This is where ideas cross-pollinate.What we offerFrom intimate pop-ups to hands-on workshops and seasonal residenciesSeasonal Pop-Up DinnersOne-time experiences that celebrate what's growing right now. Think harvest dinners in the garden, long tables under the stars, guest chef collaborations. Each event is unique, ephemeral, and worth the trip.Inspired by Outstanding in the Field and the Basque Country's food festivalsPermaculture WorkshopsHands-on sessions in composting, seed-saving, natural pest control, food forests, and regenerative growing. Learn to create your own productive ecosystem, whether you have a farm or just a balcony.Following models from Stone Barns Center and Eden Project's educational programmingProducers Market & Community DaysRegular gatherings featuring local farmers, foragers, fermenters, and artisans. More than shopping—it's cooking demos, tastings, live music, and conversations about sustainable food culture.Echoing Eden Project's Big Lunch community-building philosophyJoin us at the tableNorth of the South — A crossroads 2 hours from major European citiesLocationLa Pipa318 Camino de los NogalesSomio, GijónAsturias, SpainEasy access from Gatwick, Madrid, Amsterdam, Munich, Brussels, Milan, Barcelona & moreGet in touchCall us+34 695 269 681+34 684 629 054Monday – Friday10am – 6pmReach out about your ideaCommunity • Cider Mill • Collaboration

@@ -142,6 +142,7 @@ A 2024 cost workbook models La Pipa Studios services including audio podcasts an
 - A historical Codex task snapshot shows a Supabase project named `lapipa-ai` created on 28 July 2026. `[LP-SRC-017]`
 - In a 27 July 2026 Codex task, the user said the organization was vacating its La Pipa offices after a property-development venture-capital offer displaced the existing arrangement, despite a reported ten-year contract and first option to buy. The user also said operations were moving to downtown offices. This is user-supplied operational context, not an independently verified property record. `[LP-SRC-018]`
 - Files named `LA PIPA WILL BE` and `La_Pipa_Will_Always_Be_La_Pipa_2026-07-22...wav` suggest a continuity narrative during this transition. Their content was not fully transcribed. `[LP-SRC-020]`
+- **5 August 2026:** a rendered capture of `www.lapipa.io` documented 52 valid current pages and a bilingual architecture spanning people, principles, studio, Xente, Hackspace, Subterránea, club/food/kitchen, Fuego & Tierra, music, festivals, gigs, Futures 2021–2023, La Pipa Talks, services, work, blog summaries, contact, and legal pages. A linked media census documented 117 Vimeo, YouTube, and Spotify records and preserved 26 public YouTube caption transcripts. These are captured first-party and provider records, not independent verification of every underlying claim. `[LP-SRC-036] [LP-SRC-037]`
 
 ## Physical place and 2026 transition
 
@@ -168,7 +169,7 @@ The following identifiers appear in local handover files or historical task snap
 
 | System | Identifier or domain | Evidence boundary |
 |---|---|---|
-| Public domains | `lapipa.ai`, `www.lapipa.ai`, `lapipa.io` | Local handover and website-export references; not live-verified in this review |
+| Public domains | `lapipa.ai`, `www.lapipa.ai`, `lapipa.io` | `www.lapipa.io` rendered capture completed 5 August 2026; the `.ai` domains remain handover/export references unless separately refreshed |
 | GitHub repository | `alex-lapipa/motion-ai-pulse` | Local handover; namespace alone does not prove every `alex-lapipa` repository concerns La Pipa |
 | Vercel project | `prj_UxH3uj2fvv81U9v2sUGxG0wrptK0` | Local handover only |
 | Vercel team | `team_mNSOnF2OglXKmaAA6GfrQ489` | Local handover only |
@@ -177,7 +178,7 @@ The following identifiers appear in local handover files or historical task snap
 | Notion hub | page ID `30c425866bb581d4` | Local handover only |
 | Archive GitHub repository | `alex-lapipa/lapipa.archives` | User-supplied mapping; repository and README confirmed through the connected GitHub service on 5 August 2026 |
 | Archive Supabase project | `jxilnxchvdeiazmopslf`, name `LA PIPA ARCHIVE` | Live metadata confirmed read-only on 5 August 2026; created 4 August 2026 in `eu-west-1`, status then `ACTIVE_HEALTHY` |
-| Archive Vercel project | `prj_avksBJw1Z3RIYBTQvs7m0ZbxKp4k` | User-supplied mapping; returned 404 and was absent from the visible projects under team `team_mNSOnF2OglXKmaAA6GfrQ489` |
+| Archive Vercel project | `prj_avksBJw1Z3RIYBTQvs7m0ZbxKp4k` | User-supplied mapping; direct connector inspection remains access-limited, while GitHub deployment status confirms successful Vercel deployments for exact archive commits |
 | Notion workspace | `MIRAMONTE`, workspace ID `495d6263-bcfe-4753-b478-4141eab8ca4c` | Live connection confirmed read-only on 5 August 2026 |
 | Notion La Pipa Surface hub | page ID `34d425866bb581aa908de6c72f4a3113` | Linked by accessible onboarding documentation but returned `object_not_found` to the current integration |
 | Official Notion knowledge base | page ID `3b2425866bb581f08befc9f930417991` | Created and read-back verified on 5 August 2026; official documentation, RAG, and knowledge-graph governance hub |
@@ -190,7 +191,7 @@ No credentials, secrets, or private access tokens were retrieved or recorded.
 1. **Start date:** 2019 is best supported, but a 2026 handover records 2016 versus 2019. The generated date 29 September 2019 is not independently verified.
 2. **Legal identity:** a secondary generated report names `SERVICE DESIGN ECOSYSTEMS SL` and calls the initiative non-profit. No registry record, deed, bylaws, or primary legal document was inspected.
 3. **Physical address and tenure:** the workspace supports Somió/Gijón and a cider-mill setting. Exact title, lease, address, contract, purchase option, and 2026 transaction status require property or contract evidence.
-4. **Current status:** local handovers describe a live digital platform, while the user reported leaving the physical offices. Neither live web infrastructure nor present occupancy was independently refreshed.
+4. **Current status:** `www.lapipa.io` and the archive deployment status were refreshed on 5 August 2026, while the user reported leaving the historical physical offices. A live digital surface does not resolve present physical occupancy or the legal/operational relationships among the site, community, studio, and archive.
 5. **Event completeness:** the archive contains many media artifacts, but a single authoritative event calendar, attendee ledger, and outcome report was not found.
 6. **Financial performance:** available workbooks are plans, forecasts, cost models, or contribution models. They do not establish audited revenue, costs, investment, or realized contributions.
 7. **Organizational relationships:** La Pipa, La Pipa Studios, La Pipa TV, Bedrock, ReMotive, partner companies, the physical property, and `lapipa.ai` should remain separate entities until legal and operational relationships are documented.

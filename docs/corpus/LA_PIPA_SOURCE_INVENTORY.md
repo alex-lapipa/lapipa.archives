@@ -17,8 +17,10 @@ This inventory covers:
 - local project and handover files discoverable under the user profile;
 - the local `LA PIPA Studios Dropbox` archive;
 - directly inspected PDFs, PowerPoint files, spreadsheets, website exports, Markdown handovers, and task content.
+- a rendered capture of every route in the current `www.lapipa.io` sitemap plus valid link-discovered routes;
+- Vimeo, YouTube, and Spotify media metadata, container membership, and public captions where offered.
 
-No live web, GitHub, Vercel, Supabase, Notion, registry, property, or social-media verification was performed. Historical platform snapshots are identified as such.
+Live web, GitHub, Supabase, Notion, and deployment-status evidence was inspected where the connected access boundary allowed it. Connector failures are recorded as access boundaries, not as evidence that a platform or project is absent. No registry, property-title, contract, or social-platform account verification was performed.
 
 ## Collection-level findings
 
@@ -87,6 +89,8 @@ No live web, GitHub, Vercel, Supabase, Notion, registry, property, or social-med
 | `LP-SRC-033` | 2026-08-05 | Supabase schema, function, migration, and advisor inspection | Public tables 0; migrations 0; Edge Functions 0; security lints 0; one informational Auth connection-strategy notice | `live_connector_verified` |
 | `LP-SRC-034` | 2026-08-05 | User decision: Notion is the official knowledge base | Authorizes creation of the official project documentation, RAG, and knowledge-graph workspace in Notion | `user_supplied` |
 | `LP-SRC-035` | 2026-08-05 | Notion project creation and read-back verification | Confirms official hub, seven databases, working views, and persisted seed-record counts | `live_connector_verified` |
+| `LP-SRC-036` | 2026-08-05 | Rendered `www.lapipa.io` website accession | 52 current pages, bilingual information architecture, initiatives, people, work, blog summaries, legal pages, links, images, and route defects | `live_web_capture` |
+| `LP-SRC-037` | 2026-08-05 | Vimeo, YouTube, and Spotify provider accession | 117 deduplicated media records, four Vimeo showcases, one YouTube playlist, Spotify collections, provider metadata, availability, and 26 public caption transcripts | `live_provider_capture_mixed_availability` |
 
 ## Source locators
 
@@ -117,6 +121,8 @@ The paths below are relative to `/Users/alexlawton/LA PIPA Studios Dropbox/`. Th
 `LP-SRC-027` through `LP-SRC-033` are live Notion and Supabase connector observations rather than local archive files.
 
 `LP-SRC-034` and `LP-SRC-035` record the authorization and implementation of the official Notion knowledge base.
+
+`LP-SRC-036` and `LP-SRC-037` are collection-level live captures controlled by accession `LP-ACC-2026-0002`; their item-level stable identifiers are in `data/accessions/LP-WEB-2026-08-05/`.
 
 ## Important source details
 
@@ -365,9 +371,9 @@ For a definitive institutional archive, acquire and index:
 6. an episode-level La Pipa TV, podcast, and music catalogue;
 7. project briefs, client approvals, contracts, and public/private classification;
 8. realized financial records clearly separated from forecasts and rate cards;
-9. live verification of `lapipa.ai`, repository, Vercel, Supabase, and Notion state;
+9. continuing verification of `lapipa.ai`, repository, Vercel, Supabase, and Notion state, including owner-authenticated acceptance tests;
 10. content hashes for key archive masters to collapse backups and duplicates safely.
-11. confirmation of the Vercel team or account owning `prj_avksBJw1Z3RIYBTQvs7m0ZbxKp4k`.
+11. connector-level visibility for Vercel project `prj_avksBJw1Z3RIYBTQvs7m0ZbxKp4k`; GitHub deployment status confirms successful deployments but direct Vercel project inspection remains access-limited.
 
 ## Inventory limitations
 
@@ -376,4 +382,4 @@ For a definitive institutional archive, acquire and index:
 - Image-based PDFs were rendered and visually inspected; text was manually summarized and should be checked against the source before quoting verbatim.
 - Spreadsheet contents were reviewed read-only. Forecasts, contribution models, and rate cards were not treated as actual financial performance.
 - The visible task-history interface had a finite result window; absence from the result set is not proof that no additional task exists.
-- No live external system was queried, so technical identifiers may be stale.
+- Live external systems were queried only within the available connector and public-web boundaries. Provider-restricted media, Vercel project inspection, legal identity, property, contracts, and rights remain unresolved where explicitly noted.

@@ -5,12 +5,13 @@
   "engines": { "node": "24.x" },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node --check api/health.mjs && node --check api/search.mjs && node --check scripts/build.mjs && node --check scripts/validate-repository.mjs && node --check scripts/archive/lib.mjs && node --check scripts/archive/inventory-accession.mjs && node --check scripts/archive/create-bag.mjs && node --check scripts/archive/validate-bag.mjs",
+    "check": "node --check api/health.mjs && node --check api/search.mjs && node --check scripts/build.mjs && node --check scripts/validate-repository.mjs && node --check scripts/archive/lib.mjs && node --check scripts/archive/inventory-accession.mjs && node --check scripts/archive/create-bag.mjs && node --check scripts/archive/validate-bag.mjs && node --check scripts/archive/build-website-accession.mjs && node --check scripts/archive/validate-website-accession.mjs",
     "test": "node --test",
     "validate": "node scripts/validate-repository.mjs",
     "archive:inventory": "node scripts/archive/inventory-accession.mjs",
     "archive:create-bag": "node scripts/archive/create-bag.mjs",
     "archive:validate-bag": "node scripts/archive/validate-bag.mjs",
+    "archive:validate-website": "node scripts/archive/validate-website-accession.mjs",
     "vercel-build": "npm run build"
   }
 }

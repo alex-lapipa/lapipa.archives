@@ -1,0 +1,24 @@
+---
+document_id: "LP-WEB-LEGACY-52-DOC"
+source_id: "LP-WEB-LEGACY-52"
+title: "Unexpected Newsletter"
+language: "en"
+document_type: "legacy_page"
+origin_uri: "/theunexpected"
+verification_status: "historically_published_capture"
+access_scope: "public"
+content_sha256: "9e62072ec83a22377c42a93cdb03a57937b7a5bcc4cac814f20443aa4ba39c17"
+---
+
+# Unexpected Newsletter
+
+Archive source LP-WEB-LEGACY-52. Unexpected Newsletter.
+
+Legacy Squarespace/WordPress export record (page; status publish).
+
+Historical path: /theunexpected
+
+.fe-6522136867e0544a96e6036b { --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px); --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 ); display: grid; position: relative; grid-area: 1/1/-1/-1; grid-template-rows: repeat(9,minmax(24px, auto)); grid-template-columns: minmax(var(--grid-gutter), 1fr) repeat(8, minmax(0, var(--cell-max-width))) minmax(var(--grid-gutter), 1fr); row-gap: 11.0px; column-gap: 11.0px; overflow-x: hidden; overflow-x: clip; } @media (min-width: 768px) { .background-width--inset .fe-6522136867e0544a96e6036b { --inset-padding: calc(var(--sqs-site-gutter) * 2); } .fe-6522136867e0544a96e6036b { --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px); --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 ); --inset-padding: 0vw; --row-height-scaling-factor: 0.0215; --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) )); grid-template-rows: repeat(13,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto)); grid-template-columns: minmax(var(--grid-gutter), 1fr) repeat(24, minmax(0, var(--cell-max-width))) minmax(var(--grid-gutter), 1fr); } } .fe-block-518c200130ff8902ce30 { grid-area: 2/2/9/10; z-index: 0; @media (max-width: 767px) { } } .fe-block-518c200130ff8902ce30 .sqs-block { justify-content: flex-start; } .fe-block-518c200130ff8902ce30 .sqs-block-alignment-wrapper { align-items: flex-start; } @media (min-width: 768px) { .fe-block-518c200130ff8902ce30 { grid-area: 1/2/14/26; z-index: 0; } .fe-block-518c200130ff8902ce30 .sqs-block { justify-content: flex-start; } .fe-block-518c200130ff8902ce30 .sqs-block-alignment-wrapper { align-items: flex-start; } } ARE YOU A CURIOUS MIND?DO YOU THINK ABOUT THE FUTURE AS YOU DEAL WITH THE PRESENT? Interested in learning from my mistakes and maybe sharing yours? .fe-6522136867e0544a96e60370 { --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px); --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 ); display: grid; position: relative; grid-area: 1/1/-1/-1; grid-template-rows: repeat(11,minmax(24px, auto)); grid-template-columns: minmax(var(--grid-gutter), 1fr) repeat(8, minmax(0, var(--cell-max-width))) minmax(var(--grid-gutter), 1fr); row-gap: 11.0px; column-gap: 11.0px; overflow-x: hidden; overflow-x: clip; } @media (min-width: 768px) { .background-width--inset .fe-6522136867e0544a96e60370 { --inset-padding: calc(var(--sqs-site-gutter) * 2); } .fe-6522136867e0544a96e60370 { --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px); --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 ); --inset-padding: 0vw; --row-height-scaling-factor: 0.0215; --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) )); grid-template-rows: repeat(12,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto)); grid-template-columns: minmax(var(--grid-gutter), 1fr) repeat(24, minmax(0, var(--cell-max-width))) minmax(var(--grid-gutter), 1fr); } } .fe-block-5a2f47ffbb843e6eec19 { grid-area: 1/2/12/10; z-index: 0; @media (max-width: 767px) { } } .fe-block-5a2f47ffbb843e6eec19 .sqs-block { justify-content: flex-start; } .fe-block-5a2f47ffbb843e6eec19 .sqs-block-alignment-wrapper { align-items: flex-start; } @media (min-width: 768px) { .fe-block-5a2f47ffbb843e6eec19 { grid-area: 1/2/13/26; z-index: 0; } .fe-block-5a2f47ffbb843e6eec19 .sqs-block { justify-content: flex-start; } .fe-block-5a2f47ffbb843e6eec19 .sqs-block-alignment-wrapper { align-items: flex-start; } } #block-5a2f47ffbb843e6eec19 { box-sizing: border-box; height: 100%; padding: 3% 3% 3% 3%; border-radius: 0px 0px 0px 0px; --tweak-newsletter-block-background-color: hsla(var(--accent-hsl), 0.94) ; } The Unexpected Newsletter Join the Unexpected Newsletter and join a community of thinkers like you! First Name Last Name Email Address Get Unexpected All views in The Unexpected Newsletter are strictly personal The unexpected expects people just like you! Thanks for joining!
+
+Referenced images:
+- https://images.squarespace-cdn.com/content/v1/63d447cf0de50d14de7446d2/76fbb761-7d0c-43f6-beb5-83e5f842f2ef/art+of+data+science.jpg
