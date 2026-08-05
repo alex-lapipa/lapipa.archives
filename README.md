@@ -13,7 +13,7 @@ The version-controlled implementation for the La Pipa archive, knowledge base, p
 
 Target project: `jxilnxchvdeiazmopslf` (`LA PIPA ARCHIVE`).
 
-The migrations create private `archive`, `kb`, `kg`, `rag`, `ops`, and `private` schemas; preservation and access Storage buckets; row-level security; a relational knowledge graph; Voyage-compatible 1,024-dimensional embeddings; hybrid full-text/vector search; evaluation records; and ingestion governance. The documentary layer covers archival hierarchy, intellectual items, representations, file objects, audiovisual tracks, transcripts, rights, preservation events, fixity, accessions, and custody.
+The migrations create private `archive`, `kb`, `kg`, `rag`, `ops`, and `private` schemas; preservation and access Storage buckets; row-level security; a relational knowledge graph; Voyage-compatible 1,024-dimensional embeddings; hybrid full-text/vector search; evaluation records; and ingestion governance. The documentary layer covers archival hierarchy, intellectual items, representations, file objects, audiovisual tracks, transcripts, rights, preservation events, fixity, accessions, custody, transfer packages, preservation copies, consent, takedown, quality control, and controlled releases.
 
 Edge Functions:
 
@@ -26,8 +26,18 @@ Edge Functions:
 
 ```sh
 npm run check
+npm run validate
+npm test
 npm run build
 supabase functions serve kb-search --env-file .env.local
+```
+
+Archive package tools:
+
+```sh
+npm run archive:inventory -- /path/to/source /path/to/inventory.json
+npm run archive:create-bag -- /path/to/source /path/to/LP-ACC-2026-0001
+npm run archive:validate-bag -- /path/to/LP-ACC-2026-0001
 ```
 
 Use `.env.example` as the list of required Vercel configuration names. The Vercel proxy needs only the Supabase project URL; it forwards the caller's short-lived access token and does not hold a Supabase API key. Local secret values belong only in ignored `.env.*.local` files.

@@ -22,6 +22,12 @@ This handbook governs the documentary archive layer. The existing knowledge base
 7. [Documentary production workflow](documentary-production-workflow.md)
 8. [Publication and citation policy](publication-and-citation.md)
 9. [Continuity and disaster recovery](continuity-and-disaster-recovery.md)
+10. [Operating roadmap](operating-roadmap.md)
+11. [Quality assurance and release gates](quality-assurance-and-release-gates.md)
+12. [Storage and replication plan](storage-and-replication-plan.md)
+13. [Accession package profile](accession-package-profile.md)
+14. [Authority and controlled vocabulary plan](authority-and-vocabulary-plan.md)
+15. [Initial preservation assessment](initial-preservation-assessment.md)
 
 ## Standards profile
 
@@ -66,4 +72,3 @@ The platform has a working private knowledge/RAG foundation and a standards-alig
 - [IIIF Presentation API 3.0](https://iiif.io/api/presentation/3.0/)
 - [WebVTT](https://www.w3.org/TR/webvtt1/)
 - [Library of Congress Sustainability of Digital Formats](https://www.loc.gov/preservation/digital/formats/)
-

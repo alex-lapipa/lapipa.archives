@@ -33,3 +33,5 @@ Object paths begin `la-pipa/`. Database records preserve bucket, object path, MI
 The private `archive` schema implements LP-MAP 1.0. It separates collection hierarchy, intellectual items, representations, files, audiovisual essence tracks, transcripts, rights statements, preservation events, fixity checks, accessions, and custody events. Links to `kb.sources` and `kb.entities` keep archival description connected to the existing provenance graph without treating generated knowledge records as replacements for original objects.
 
 The model is aligned to PREMIS 3.0 and PBCore 2.1, with future IIIF Presentation 3.0 exports. This is an application profile and preservation foundation, not a claim of repository certification.
+
+Operational controls model submission, archival, and dissemination packages; independently testable storage locations and file copies; source-to-derivative lineage; consent and withdrawal; takedown triage; typed quality-control checks; accountable release approval; and periodic preservation-maturity assessments. The configured Supabase location is explicitly an operational copy, not evidence of an independent preservation replica.

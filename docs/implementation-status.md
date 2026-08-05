@@ -3,7 +3,7 @@
 ## Supabase
 
 - Project: `jxilnxchvdeiazmopslf` (`LA PIPA ARCHIVE`)
-- Schemas: `archive` (21 preservation and documentary-control tables), `kb` (15), `kg` (3), `rag` (5), `ops` (6), plus private authorization helpers.
+- Schemas: `archive` (32 preservation and documentary-control tables), `kb` (15), `kg` (3), `rag` (5), `ops` (6), plus private authorization helpers.
 - Reviewed seed: 35 sources, 9 claims, 14 entities, 9 events, 11 relationships, 19 chunks, and 8 evaluation questions.
 - Voyage: 19 contextual embeddings using `voyage-context-4` at 1,024 dimensions.
 - Storage: `source-originals`, `source-derivatives`, `knowledge-exports`, `preservation-masters`, and `access-media`; all private.
@@ -13,6 +13,9 @@
 - Edge Functions: `kb-search` and `kb-embed`, both active with JWT verification.
 - Temporary bootstrap function and temporary bootstrap secret: removed after the controlled embedding seed.
 - Documentary archive: LP-MAP 1.0 collection hierarchy, item, representation, file, AV track, transcript, rights, PREMIS-style event, fixity, accession, and custody structures are implemented. The root archival control record is `LP-ARCHIVE-001`.
+- Operating controls: BagIt transfer packages, preservation-copy locations, source-to-derivative lineage, consent, takedown, quality gates, approved releases, and preservation assessments are implemented. Supabase is registered only as the operational location; independent preservation copies remain an owner-approved next step.
+- Repository assurance: locked Node 24 build, dependency audit, archive tooling tests, local-link and migration validation, pinned GitHub Actions, Dependabot, and a preservation-aware pull-request checklist.
+- Preservation assessment: `LP-ASSESS-2026-0001` records a conservative NDSA Levels 2.1 baseline. No maturity level is claimed because no real archival payload, independent replica, isolated copy, or restore test has yet completed the workflow.
 
 The remaining security-advisor warning is Supabase Auth leaked-password protection. It is a plan/dashboard setting and should be enabled before password-based user onboarding if the project plan supports it. New-database unused-index notices are expected until representative workloads exercise the indexes. The Auth connection-allocation notice matters only when scaling compute.
 
