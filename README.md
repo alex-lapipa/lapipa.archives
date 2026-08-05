@@ -15,6 +15,8 @@ Target project: `jxilnxchvdeiazmopslf` (`LA PIPA ARCHIVE`).
 
 The migrations create private `archive`, `kb`, `kg`, `rag`, `ops`, and `private` schemas; preservation and access Storage buckets; row-level security; a relational knowledge graph; Voyage-compatible 1,024-dimensional embeddings; hybrid full-text/vector search; evaluation records; and ingestion governance. The documentary layer covers archival hierarchy, intellectual items, representations, file objects, audiovisual tracks, transcripts, rights, preservation events, fixity, accessions, custody, transfer packages, preservation copies, consent, takedown, quality control, and controlled releases.
 
+Alex Lawton is the active archive owner, bound by immutable confirmed Auth UUID rather than editable profile metadata. Database authorization acceptance has passed. The first controlled submission package, `LP-ACC-2026-0001` / `LP-BAG-2026-0001`, contains the 2019 origin-deck PDF and validates with zero BagIt failures; managed-storage ingest and preservation completion remain separate pending gates.
+
 Edge Functions:
 
 - `kb-search`: authenticated Voyage query embedding plus hybrid retrieval.

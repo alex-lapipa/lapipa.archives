@@ -10,6 +10,8 @@ La Pipa should become an archive that can demonstrate—not merely assert—that
 
 ## Phase 0 — accountable control
 
+**Current state:** Alex Lawton's confirmed Auth UUID is assigned the active `owner` role. Database authorization tests are implemented. Interactive sign-in, recovery and session tests, a second trusted administrator, and leaked-password protection remain pending.
+
 **Exit criteria:** the intended human owner authenticates; their exact `auth.users.id` is assigned the `owner` role; a second trusted administrator is documented; short-lived session and incident procedures are tested; leaked-password protection is enabled if the Supabase plan supports it.
 
 No public release, irreversible disposal, rights approval, or production promotion precedes this gate.

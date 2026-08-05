@@ -52,3 +52,20 @@ test("BagIt validation detects changed tag metadata", async () => {
   await writeFile(resolve(bag, "bag-info.txt"), "Payload-Oxum: 0.0\n", "utf8");
   await assert.rejects(exec(process.execPath, ["scripts/archive/validate-bag.mjs", bag], { cwd: project }));
 });
+
+test("a single source file can be inventoried and packaged without staging", async () => {
+  const root = await mkdtemp(resolve(tmpdir(), "lapipa-single-file-"));
+  const source = resolve(root, "origin-deck.pdf");
+  const inventory = resolve(root, "evidence", "inventory.json");
+  const bag = resolve(root, "package");
+  await writeFile(source, "representative origin deck bytes");
+
+  await exec(process.execPath, ["scripts/archive/inventory-accession.mjs", source, inventory], { cwd: project });
+  const manifest = JSON.parse(await readFile(inventory, "utf8"));
+  assert.equal(manifest.file_count, 1);
+  assert.equal(manifest.records[0].path, "origin-deck.pdf");
+
+  await exec(process.execPath, ["scripts/archive/create-bag.mjs", source, bag], { cwd: project });
+  const validation = await exec(process.execPath, ["scripts/archive/validate-bag.mjs", bag], { cwd: project });
+  assert.equal(JSON.parse(validation.stdout).valid, true);
+});

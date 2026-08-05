@@ -28,6 +28,10 @@ This handbook governs the documentary archive layer. The existing knowledge base
 13. [Accession package profile](accession-package-profile.md)
 14. [Authority and controlled vocabulary plan](authority-and-vocabulary-plan.md)
 15. [Initial preservation assessment](initial-preservation-assessment.md)
+16. [Owner and role register](owner-and-role-register.md)
+17. [First accession runbook](first-accession-runbook.md)
+18. [Access-control acceptance tests](access-control-acceptance-tests.md)
+19. [First accession report](first-accession-report.md)
 
 ## Standards profile
 
@@ -59,7 +63,7 @@ The implementation is an application profile, not a claim of formal certificatio
 
 ## Current maturity boundary
 
-The platform has a working private knowledge/RAG foundation and a standards-aligned archival schema. It does not yet claim trustworthy digital repository certification, geographic redundancy, preservation-format normalization for all media, or public availability. Those outcomes require operating evidence, assigned human owners, tested recovery, and continuing review.
+The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, and an assigned human owner. It does not yet claim trustworthy digital repository certification, geographic redundancy, preservation-format normalization for all media, or public availability. Those outcomes require operating evidence, a backup administrator, tested recovery, and continuing review.
 
 ## Authoritative references
 

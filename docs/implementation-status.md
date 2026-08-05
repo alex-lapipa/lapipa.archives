@@ -14,6 +14,7 @@
 - Temporary bootstrap function and temporary bootstrap secret: removed after the controlled embedding seed.
 - Documentary archive: LP-MAP 1.0 collection hierarchy, item, representation, file, AV track, transcript, rights, PREMIS-style event, fixity, accession, and custody structures are implemented. The root archival control record is `LP-ARCHIVE-001`.
 - Operating controls: BagIt transfer packages, preservation-copy locations, source-to-derivative lineage, consent, takedown, quality gates, approved releases, and preservation assessments are implemented. Supabase is registered only as the operational location; independent preservation copies remain an owner-approved next step.
+- First accession evidence: `LP-ACC-2026-0001` and valid BagIt submission package `LP-BAG-2026-0001` contain the 2019 origin-deck PDF (1 file; 194,031,448 bytes). Managed-storage ingest, malware scanning, file-object registration, rights review, independent replication, and restore testing remain pending.
 - Repository assurance: locked Node 24 build, dependency audit, archive tooling tests, local-link and migration validation, pinned GitHub Actions, Dependabot, and a preservation-aware pull-request checklist.
 - Preservation assessment: `LP-ASSESS-2026-0001` records a conservative NDSA Levels 2.1 baseline. No maturity level is claimed because no real archival payload, independent replica, isolated copy, or restore test has yet completed the workflow.
 
@@ -30,4 +31,4 @@ The remaining security-advisor warning is Supabase Auth leaked-password protecti
 
 ## Access bootstrap
 
-No user identity was guessed or silently granted ownership. After the intended owner signs into Supabase Auth, an authorized database administrator must insert that exact `auth.users.id` into `kb.workspace_members` with role `owner`. Thereafter, owner/editor users can run embeddings and owner/editor/reviewer/reader users can search.
+Alex Lawton explicitly declared archive ownership. The sole active confirmed Alex Auth identity was reconciled by immutable `auth.users.id` and assigned the active `owner` role in `kb.workspace_members`; editable user metadata is not used for authorization. Owner/editor users can run embeddings and owner/editor/reviewer/reader users can search. Interactive sign-in, recovery, session refresh, and client acceptance tests remain pending.

@@ -1,24 +1,26 @@
 import { cp, mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
-import { inventoryDirectory, isWithin, resolveInputDirectory, sha256File, sha256Text } from "./lib.mjs";
+import { inventoryInput, isWithin, resolveAccessionInput, sha256File, sha256Text } from "./lib.mjs";
 
 const [inputArg, bagArg] = process.argv.slice(2);
 if (!inputArg || !bagArg) {
-  console.error("Usage: node scripts/archive/create-bag.mjs <input-directory> <new-bag-directory>");
+  console.error("Usage: node scripts/archive/create-bag.mjs <input-file-or-directory> <new-bag-directory>");
   process.exit(2);
 }
 
-const input = await resolveInputDirectory(inputArg);
+const input = await resolveAccessionInput(inputArg);
 const bag = resolve(bagArg);
-if (bag === input || isWithin(input, bag) || isWithin(bag, input)) throw new Error("bag and accession input must be separate directories");
+if (bag === input.path || (input.input_type === "directory" && isWithin(input.path, bag)) || isWithin(bag, input.path)) {
+  throw new Error("bag and accession input must be separate locations");
+}
 try { await stat(bag); throw new Error("bag output already exists; existing packages are never overwritten"); } catch (error) { if (error.code !== "ENOENT") throw error; }
 
 const temporary = resolve(dirname(bag), `.${basename(bag)}.building-${process.pid}`);
 try {
   await mkdir(resolve(temporary, "data"), { recursive: true });
-  const records = await inventoryDirectory(input);
+  const records = await inventoryInput(input);
   for (const record of records) {
-    const source = resolve(input, record.path);
+    const source = resolve(input.root, record.path);
     const target = resolve(temporary, "data", record.path);
     await mkdir(dirname(target), { recursive: true });
     await cp(source, target, { dereference: false, errorOnExist: true, force: false, preserveTimestamps: true });

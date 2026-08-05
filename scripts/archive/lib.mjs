@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat, readdir, realpath } from "node:fs/promises";
-import { basename, isAbsolute, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
 
 export const MANIFEST_SCHEMA = "https://lapipa.archive/schemas/accession-manifest/v1";
 
@@ -33,6 +33,30 @@ export async function resolveInputDirectory(input) {
   return root;
 }
 
+export async function resolveAccessionInput(input) {
+  if (!input) throw new Error("accession input is required");
+  const unresolved = resolve(input);
+  const sourceStat = await lstat(unresolved);
+  if (sourceStat.isSymbolicLink()) throw new Error("symbolic links are not accepted as accession inputs");
+  const path = await realpath(unresolved);
+  if (path === sep) throw new Error("filesystem root cannot be an accession input");
+  const stat = await lstat(path);
+  if (stat.isDirectory()) return { path, root: path, input_type: "directory", package_label: basename(path) };
+  if (stat.isFile()) return { path, root: dirname(path), input_type: "file", package_label: basename(path) };
+  throw new Error("accession input must be a regular file or directory");
+}
+
+export async function inventoryInput(input) {
+  if (input.input_type === "directory") return inventoryDirectory(input.path);
+  const stat = await lstat(input.path);
+  return [{
+    path: basename(input.path),
+    byte_count: stat.size,
+    sha256: await sha256File(input.path),
+    modified_at: stat.mtime.toISOString(),
+  }];
+}
+
 export async function inventoryDirectory(root) {
   const records = [];
   async function visit(directory) {
@@ -60,10 +84,10 @@ export async function inventoryDirectory(root) {
   return records;
 }
 
-export function manifestEnvelope(root, records, createdAt = new Date().toISOString()) {
+export function manifestEnvelope(root, records, createdAt = new Date().toISOString(), packageLabel = basename(root)) {
   return {
     schema: MANIFEST_SCHEMA,
-    package_label: basename(root),
+    package_label: packageLabel,
     created_at: createdAt,
     digest_algorithm: "sha256",
     file_count: records.length,
