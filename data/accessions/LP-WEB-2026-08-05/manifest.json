@@ -1,0 +1,37 @@
+{
+  "archive_profile": "LP-WEB-ACCESSION-1.0",
+  "accession_id": "LP-ACC-2026-0002",
+  "generated_at": "2026-08-05T01:12:44.427Z",
+  "source_count": 224,
+  "document_count": 224,
+  "chunk_count": 327,
+  "counts": {
+    "live": 52,
+    "legacy": 55,
+    "media": 117
+  },
+  "transcript_count": 26,
+  "restricted_provider_reference_count": 15,
+  "capture_scope": {
+    "sitemap_pages": 50,
+    "additional_valid_routes": 2,
+    "legacy_export_items": 55,
+    "media_records": 117
+  },
+  "chunk_profile": {
+    "id": "LP-RAG-CHUNK-1.0",
+    "max_characters": 3600,
+    "overlap_characters": 400,
+    "approximate_token_count": true
+  },
+  "embedding_target": {
+    "provider": "voyage",
+    "model": "voyage-context-4",
+    "dimensions": 1024,
+    "status": "pending_authenticated_ingestion"
+  },
+  "file_sha256": {
+    "sources.jsonl": "6353a04aed11e1622b064dbb636ace49bc6a528732ae5daf0f48bd84805bdad0",
+    "chunks.jsonl": "f49200d1e3974fe68460fb027af108932ce08af711767f7bea63bb9e5347f066"
+  }
+}

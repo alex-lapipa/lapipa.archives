@@ -1,0 +1,23 @@
+---
+document_id: "LP-WEB-LIVE-ES-BLOG-DOC"
+source_id: "LP-WEB-LIVE-ES-BLOG"
+title: "Blog"
+language: "es"
+document_type: "website_page"
+origin_uri: "https://www.lapipa.io/es/blog"
+verification_status: "captured_public_claim"
+access_scope: "public"
+content_sha256: "1c2cd7fa19b730cdd9e446da5bf45d2a16e2f5a4c9940f7202794e761e8fea24"
+---
+
+# Blog
+
+Archive source LP-WEB-LIVE-ES-BLOG. Blog.
+
+Captured public page: https://www.lapipa.io/es/blog
+
+Capture timestamp: 2026-08-05T01:12:32.355Z
+
+Page description: Explora la colección de pensamientos, historias y perspectivas de LA PIPA de nuestra comunidad
+
+PERSPECTIVASE HISTORIASBLOGPerspectivas de vanguardia, pensamiento radical y comentario cultural de la comunidad LA PIPATodasdata-managementdata-clean-roomdata-privacymarketingdata-governancepowerbidata-visualizationbusiness-intelligencedata-scienceprivacymachine-learninggdprmarketing-technologydeep-learningneural-networksartificial-intelligenceoptimizationadoptionchange-managementbusiness-strategyorganizational-culturestatisticsdata-preprocessingtrendstechnologytransformersnatural-language-processingcomputer-visiondata-managementdata-clean-roomData Clean Rooms: the key to marketing successUnlock the full potential of your data and remain compliant for a data-driven marketing strategy24 ene 2023Manuel Souto Juandata-managementdata-clean-roomData Clean Rooms: the key to marketing successUnlock the full potential of your data and remain compliant for a data-driven marketing strategy24 ene 2023Manuel Souto Juanpowerbidata-visualizationHow to connect dashboard filters using multiple unrelated data tables in PowerBIA practical guide to connecting dashboard filters using multiple unrelated data tables in PowerBI06 dic 2022Alex Lawtonpowerbidata-visualizationHow to connect dashboard filters using multiple unrelated data tables in PowerBIA practical guide to connecting dashboard filters using multiple unrelated data tables in PowerBI06 dic 2022Alex Lawtonmarketingdata-scienceConsumer-centric marketing in a cookie-less worldBuild a future-proof marketing strategy by leveraging Data Science and Machine Learning capabilities29 nov 2022Alex Lawtonmarketingdata-scienceConsumer-centric marketing in a cookie-less worldBuild a future-proof marketing strategy by leveraging Data Science and Machine Learning capabilities29 nov 2022Alex Lawtondata-privacydata-clean-roomData Clean RoomsAn introduction to Data Clean Rooms and their role in privacy-compliant data collaboration01 nov 2022Jesus Templadodeep-learningneural-networksHave you ever stopped to think about why ReLU function works so well?Understanding the ReLU activation function and why it works so well in neural networks10 ago 2022Lorenzo Amantedeep-learningneural-networksHave you ever stopped to think about why ReLU function works so well?Understanding the ReLU activation function and why it works so well in neural networks10 ago 2022Lorenzo Amantedeep-learningoptimizationHow using adaptive methods can help your network perform betterUnderstanding adaptive optimization methods for neural networks: Adam, RMSprop, and AdaGrad20 jul 2022Lorenzo Amantedata-scienceadoptionDriving adoption in data science solutionsStrategies for driving adoption in data science solutions across organizations15 jun 2022Alex Lawtondata-scienceadoptionDriving adoption in data science solutionsUnderstanding the human factors behind successful data science adoption in organizations15 may 2022Alex Lawtondata-sciencestatisticsOutliers in data preprocessingUnderstanding multivariate outliers and the Mahalanobis distance in data preprocessing07 abr 2022Alex Lawtondata-sciencestatisticsOutliers in data preprocessingUnderstanding multivariate outliers and the Mahalanobis distance in data preprocessing07 abr 2022Alex Lawtondata-scienceartificial-intelligence7 trends that will define transformational programs and data initiatives in 2022Key trends in data science and AI that will shape 2022, from Data Lake Houses to augmented workforce20 ene 2022Alex Lawtondata-scienceartificial-intelligence7 trends that will define transformational programs and data initiatives in 2022Key trends in data science and AI that will shape 2022, from Data Lake Houses to augmented workforce20 ene 2022Alex Lawtontransformersdeep-learningTRANSFORMERS: multi-purpose AI models in disguiseHow the Transformer architecture is revolutionizing AI across multiple domains from NLP to computer vision15 dic 2021Lorenzo Amantetransformersdeep-learningTRANSFORMERS: multi-purpose AI models in disguiseHow Transformer models are expanding beyond NLP into Computer Vision and other AI domains15 dic 2021Lorenzo Amante18Publicaciones Totales4Colaboradores28Categorías

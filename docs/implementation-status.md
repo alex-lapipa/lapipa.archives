@@ -6,6 +6,7 @@
 - Schemas: `archive` (32 preservation and documentary-control tables), `kb` (15), `kg` (3), `rag` (5), `ops` (6), plus private authorization helpers.
 - Reviewed seed: 35 sources, 9 claims, 14 entities, 9 events, 11 relationships, 19 chunks, and 8 evaluation questions.
 - Voyage: 19 contextual embeddings using `voyage-context-4` at 1,024 dimensions.
+- Website accession `LP-ACC-2026-0002` is repository-ready: 52 current pages, 55 legacy export records, 117 external-media records, 26 captured YouTube transcripts, and 327 deterministic chunks. Database insertion and Voyage embedding remain separate acceptance gates until the migration and authenticated embedding run are verified.
 - Storage: `source-originals`, `source-derivatives`, `knowledge-exports`, `preservation-masters`, and `access-media`; all private.
 - Provenance validation: zero chunks without sources and zero claims without sources.
 - RLS validation: enabled on every archive table.

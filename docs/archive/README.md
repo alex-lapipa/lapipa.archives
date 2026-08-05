@@ -32,6 +32,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 17. [First accession runbook](first-accession-runbook.md)
 18. [Access-control acceptance tests](access-control-acceptance-tests.md)
 19. [First accession report](first-accession-report.md)
+20. [Website and media accession — 5 August 2026](website-accession-2026-08-05.md)
 
 ## Standards profile
 

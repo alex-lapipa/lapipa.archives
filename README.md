@@ -40,6 +40,7 @@ Archive package tools:
 npm run archive:inventory -- /path/to/source /path/to/inventory.json
 npm run archive:create-bag -- /path/to/source /path/to/LP-ACC-2026-0001
 npm run archive:validate-bag -- /path/to/LP-ACC-2026-0001
+npm run archive:validate-website -- data/accessions/LP-WEB-2026-08-05
 ```
 
 Use `.env.example` as the list of required Vercel configuration names. The Vercel proxy needs only the Supabase project URL; it forwards the caller's short-lived access token and does not hold a Supabase API key. Local secret values belong only in ignored `.env.*.local` files.
