@@ -5,7 +5,7 @@ capture_date: 2026-08-05
 source_domain: https://www.lapipa.io/
 verification_status: captured_with_attribution
 rights_status: pending_item_level_review
-rag_status: chunks_ready_embeddings_pending
+rag_status: embedded_and_reconciled
 ---
 
 # La Pipa website and media accession — 5 August 2026
@@ -58,7 +58,7 @@ These are captured descriptions of La Pipa's identity and activity. The accessio
 
 The accession uses chunk profile `LP-RAG-CHUNK-1.0`: a maximum of 3,600 characters with a 400-character overlap and a deliberately labelled approximate token count. The database migration inserts sources, documents, versions, chunks, source links, archive items, subcollections, and the ingestion audit record. New chunks are intended for the existing server-side Voyage pipeline using `voyage-context-4` at 1,024 dimensions. The Voyage secret remains only in Supabase.
 
-Embedding is an independent acceptance gate. A successfully inserted chunk is not represented as semantically searchable until its content hash has a matching active Voyage embedding. Retrieval acceptance must test citations, bilingual queries, inaccessible-media behavior, duplicate control, and the distinction between present website claims and historical evidence.
+Embedding was completed as an independent acceptance gate. All 327 accession chunks have active, content-hash-matching Voyage embeddings and zero are missing or stale. Retrieval acceptance must still test citations, bilingual queries, inaccessible-media behavior, duplicate control, and the distinction between present website claims and historical evidence.
 
 ## Known defects and preservation gaps
 
@@ -82,4 +82,4 @@ Embedding is an independent acceptance gate. A successfully inserted chunk is no
 
 ## Acceptance criteria
 
-The accession is accepted only when the repository validator passes, the migration applies without partial state, database totals reconcile with the manifest, every chunk has a source, all 327 new chunks receive matching Voyage embeddings, retrieval returns source identifiers and origin URIs, restricted records remain access-controlled, and a preservation-copy plan has been approved for media selected for long-term custody.
+Repository, migration, provenance, total-reconciliation, and Voyage embedding gates have passed. Remaining release gates are retrieval/citation evaluation, restricted-record access tests, item-level rights review, and approval of a preservation-copy plan for media selected for long-term custody.
