@@ -157,6 +157,12 @@ The July 2026 relocation statement is evidence of a change in physical occupancy
 
 The precise legal and operational relationships among these entities remain unresolved.
 
+## Rights ownership declaration
+
+On 5 August 2026, Alex Lawton directly stated that he and his holding company, **Miramonte, S.L.**, collectively own 100% of the intellectual-property and related rights in La Pipa and the associated project materials. This is an approved archive-level operational rights declaration with evidence class `user_supplied`; it is not represented as an independently verified chain-of-title opinion. `[LP-SRC-038]`
+
+The declaration authorizes preservation, description, indexing, embedding, replication, controlled access, and preparation for documentary use. It does not automatically make every item public or supersede separate privacy, consent, moral-rights, performer, confidentiality, contractual, trademark, accessibility, and release review.
+
 ## Organizations and people
 
 The 2019 deck places founders and strategic leaders from Gijón at the centre of the project and displays the names José Diego, Alex Lawton, Sergio Maldonado, Jaime Pire, and José Luis Quirós. It also presents a network of companies and initiatives, including Infinity/Beyond-related media businesses, Bedrock Intelligence, Privacy Cloud, DAC Iberia, MediaSquare, Mestizo, Vibralive, Mind FM, Somio.com, Haze Academy, Socialmood, and Mediadvanced.
@@ -189,12 +195,12 @@ No credentials, secrets, or private access tokens were retrieved or recorded.
 ## Evidence conflicts and unresolved questions
 
 1. **Start date:** 2019 is best supported, but a 2026 handover records 2016 versus 2019. The generated date 29 September 2019 is not independently verified.
-2. **Legal identity:** a secondary generated report names `SERVICE DESIGN ECOSYSTEMS SL` and calls the initiative non-profit. No registry record, deed, bylaws, or primary legal document was inspected.
+2. **Legal identity:** Alex Lawton names himself and Miramonte, S.L. as the collective 100% rights holders in an owner declaration dated 5 August 2026. A secondary generated report separately names `SERVICE DESIGN ECOSYSTEMS SL` and calls the initiative non-profit. No registry record, deed, bylaws, chain-of-title schedule, or corporate relationship document was independently inspected.
 3. **Physical address and tenure:** the workspace supports Somió/Gijón and a cider-mill setting. Exact title, lease, address, contract, purchase option, and 2026 transaction status require property or contract evidence.
 4. **Current status:** `www.lapipa.io` and the archive deployment status were refreshed on 5 August 2026, while the user reported leaving the historical physical offices. A live digital surface does not resolve present physical occupancy or the legal/operational relationships among the site, community, studio, and archive.
 5. **Event completeness:** the archive contains many media artifacts, but a single authoritative event calendar, attendee ledger, and outcome report was not found.
 6. **Financial performance:** available workbooks are plans, forecasts, cost models, or contribution models. They do not establish audited revenue, costs, investment, or realized contributions.
-7. **Organizational relationships:** La Pipa, La Pipa Studios, La Pipa TV, Bedrock, ReMotive, partner companies, the physical property, and `lapipa.ai` should remain separate entities until legal and operational relationships are documented.
+7. **Organizational relationships:** the rights declaration establishes Alex Lawton and Miramonte, S.L. as the declared La Pipa rights holders for archive operations. La Pipa, La Pipa Studios, La Pipa TV, Bedrock, ReMotive, partner companies, the physical property, and `lapipa.ai` otherwise remain separate entities until their legal and operational relationships are documented.
 8. **Archive duplication:** many of the 2,557 La-Pipa-named paths are Final Cut backups, copies, or exports. Path counts must not be interpreted as unique projects.
 9. **Archive deployment identity:** GitHub and Supabase confirm the newly supplied archive connections. The supplied Vercel project ID is not visible under the connected La Pipa team; it may belong to a different team/account, be inaccessible to the connector, or be stale.
 

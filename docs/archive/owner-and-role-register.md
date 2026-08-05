@@ -8,6 +8,8 @@ Review frequency: semi-annual and on every role change
 
 The archive owner is **Alex Lawton**, surname spelled **L-A-W-T-O-N**.
 
+Alex Lawton further declared on 2026-08-05 that he and his holding company, **Miramonte, S.L.**, collectively own 100% of the intellectual-property and related rights in La Pipa and the associated project materials. This is controlled as owner-supplied source `LP-SRC-038`; see [Rights ownership declaration — LP-DOC-ARCH-021](rights-ownership-declaration.md). Miramonte, S.L. is a rights-holder organization, not an automatically inferred Supabase user or workspace role.
+
 The owner declaration was supplied directly by Alex Lawton on 2026-08-05. Two confirmed Supabase Auth identities are pre-authorized for the same archive principal: `alex@rmtv.io` and `lawton.alex@gmail.com`. Each immutable Auth UUID is bound to the active `owner` role in `kb.workspace_members` and recorded in the private `kb.authorized_identities` governance register.
 
 Authorization, Auth confirmation, and actual sign-in are distinct states. At verification on 2026-08-05, both identities had `last_sign_in_at = null` and zero sessions, so both are recorded as `bound_confirmed`, not as signed in. Authorization does not depend on editable user metadata, a display name, or organizational association.
