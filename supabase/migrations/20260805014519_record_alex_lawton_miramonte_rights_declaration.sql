@@ -57,6 +57,34 @@ insert into archive.agents (
   biography_or_history, metadata
 )
 select
+  'LP-AGENT-ALEX-LAWTON',
+  e.id,
+  'person',
+  'Alex Lawton',
+  array['Alex Lawton (L-A-W-T-O-N)'],
+  'Archive owner for the La Pipa Documentary Archive. Alex Lawton declared on 2026-08-05 that he and his holding company, Miramonte, S.L., collectively own 100% of the intellectual-property and related rights in La Pipa and associated project materials.',
+  jsonb_build_object(
+    'governance_role', 'archive_owner_and_declared_rights_holder',
+    'evidence_class', 'user_supplied',
+    'rights_declaration_source_id', 'LP-SRC-038',
+    'co_holder_agent_id', 'LP-AGENT-MIRAMONTE-SL',
+    'rights_declaration_date', '2026-08-05'
+  )
+from kb.entities e
+where e.entity_id = 'person:alex-lawton'
+on conflict (agent_id) do update
+set entity_id = excluded.entity_id,
+    authorized_name = excluded.authorized_name,
+    alternative_names = excluded.alternative_names,
+    biography_or_history = excluded.biography_or_history,
+    metadata = archive.agents.metadata || excluded.metadata,
+    updated_at = now();
+
+insert into archive.agents (
+  agent_id, entity_id, agent_type, authorized_name, alternative_names,
+  biography_or_history, metadata
+)
+select
   'LP-AGENT-MIRAMONTE-SL',
   e.id,
   'organization',
@@ -380,11 +408,7 @@ select
   'LP-ARCHIVE-001',
   'Archive-level copyright ownership is declared by Alex Lawton for himself and Miramonte, S.L. Continue item-level privacy, consent, moral-rights, performer, confidentiality, contractual, trademark, accessibility, and release review before unrestricted publication.',
   'open',
-  '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid
-where exists (
-  select 1 from auth.users
-  where id = '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid
-)
+  (select id from auth.users where id = '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid)
 on conflict (review_id) do update
 set reason = excluded.reason,
     status = excluded.status,
@@ -399,7 +423,7 @@ select
   'LP-EMBED-RIGHTS-2026-08-05',
   'voyage_contextual_embedding',
   'queued',
-  '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid,
+  (select id from auth.users where id = '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid),
   jsonb_build_object(
     'source_id', 'LP-SRC-038',
     'document_id', 'lp-rights-ownership-declaration-2026-08-05-v1',
@@ -410,10 +434,6 @@ select
     'evidence_boundary', 'user_supplied_owner_declaration'
   ),
   jsonb_build_object('expected_chunks', 1, 'embedded', 0, 'pending', 1)
-where exists (
-  select 1 from auth.users
-  where id = '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid
-)
 on conflict (job_id) do update
 set input_manifest = excluded.input_manifest,
     counts = case
@@ -425,7 +445,7 @@ insert into ops.audit_log (
   actor_user_id, actor_role, action, record_type, stable_record_id, details
 )
 select
-  '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid,
+  (select id from auth.users where id = '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid),
   'owner',
   'rights_ownership_declaration_recorded',
   'rights_declaration',
@@ -443,11 +463,7 @@ select
     'independent_legal_verification_claimed', false,
     'access_scope_changed', false
   )
-where exists (
-  select 1 from auth.users
-  where id = '827fa26f-df7f-4d24-9521-0e44bcf37696'::uuid
-)
-and not exists (
+where not exists (
   select 1 from ops.audit_log
   where action = 'rights_ownership_declaration_recorded'
     and stable_record_id = 'LP-DOC-ARCH-021'
