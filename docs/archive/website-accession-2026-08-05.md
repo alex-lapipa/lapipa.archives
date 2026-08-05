@@ -4,7 +4,7 @@ profile: LP-WEB-ACCESSION-1.0
 capture_date: 2026-08-05
 source_domain: https://www.lapipa.io/
 verification_status: captured_with_attribution
-rights_status: pending_item_level_review
+rights_status: owner_copyright_declaration_recorded_other_item_level_reviews_pending
 rag_status: embedded_and_reconciled
 ---
 
@@ -67,7 +67,7 @@ Embedding was completed as an independent acceptance gate. All 327 accession chu
 - The current `/perspectives` route rendered Futures 2021 content during capture; this is recorded as observed behavior rather than silently corrected.
 - Fifteen provider records could not be fully enriched because they are private, restricted, or unavailable.
 - Provider-hosted audiovisual bitstreams have not yet been copied into managed preservation storage. This accession preserves identity, metadata, relationships, availability, origin URLs, and transcripts where offered.
-- Item-level copyright, performer consent, music licensing, privacy, and publication review are pending before public redistribution of media or transcripts.
+- Alex Lawton's archive-level declaration names Alex Lawton and Miramonte, S.L. as the collective 100% rights holders. Item-level privacy, performer or participant consent, moral rights, music clearance, contractual conditions, sensitivity, accessibility, and publication review remain pending before unrestricted redistribution of media or transcripts.
 - Independent preservation replication and restore testing remain pending; Supabase and GitHub are operational systems, not the only preservation copies.
 
 ## Files and controls
@@ -82,4 +82,4 @@ Embedding was completed as an independent acceptance gate. All 327 accession chu
 
 ## Acceptance criteria
 
-Repository, migration, provenance, total-reconciliation, and Voyage embedding gates have passed. Remaining release gates are retrieval/citation evaluation, restricted-record access tests, item-level rights review, and approval of a preservation-copy plan for media selected for long-term custody.
+Repository, migration, provenance, total-reconciliation, Voyage embedding, and archive-level rights-holder declaration gates have passed. Remaining release gates are retrieval/citation evaluation, restricted-record access tests, non-copyright item-level rights and ethics review, and execution of the preservation-copy plan for media selected for long-term custody.

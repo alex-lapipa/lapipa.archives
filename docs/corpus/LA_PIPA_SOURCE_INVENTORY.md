@@ -91,6 +91,7 @@ Live web, GitHub, Supabase, Notion, and deployment-status evidence was inspected
 | `LP-SRC-035` | 2026-08-05 | Notion project creation and read-back verification | Confirms official hub, seven databases, working views, and persisted seed-record counts | `live_connector_verified` |
 | `LP-SRC-036` | 2026-08-05 | Rendered `www.lapipa.io` website accession | 52 current pages, bilingual information architecture, initiatives, people, work, blog summaries, legal pages, links, images, and route defects | `live_web_capture` |
 | `LP-SRC-037` | 2026-08-05 | Vimeo, YouTube, and Spotify provider accession | 117 deduplicated media records, four Vimeo showcases, one YouTube playlist, Spotify collections, provider metadata, availability, and 26 public caption transcripts | `live_provider_capture_mixed_availability` |
+| `LP-SRC-038` | 2026-08-05 | Direct declaration by Alex Lawton | Alex Lawton states that he and his holding company, Miramonte, S.L., collectively own 100% of the intellectual-property and related rights in La Pipa and associated project materials | `user_supplied` |
 
 ## Source locators
 
