@@ -11,6 +11,7 @@
 - RLS validation: enabled on every archive table.
 - Direct authenticated table grants: zero; access is through a minimal checked RPC surface.
 - Edge Functions: `kb-search` and `kb-embed`, both active with JWT verification.
+- Identity governance: `kb.authorized_identities` privately records pre-authorization, immutable Auth binding, and sign-in evidence as separate states. Both Alex Lawton identities are confirmed, active owners and currently `bound_confirmed`; neither had signed in at verification.
 - Temporary bootstrap function and temporary bootstrap secret: removed after the controlled embedding seed.
 - Documentary archive: LP-MAP 1.0 collection hierarchy, item, representation, file, AV track, transcript, rights, PREMIS-style event, fixity, accession, and custody structures are implemented. The root archival control record is `LP-ARCHIVE-001`.
 - Operating controls: BagIt transfer packages, preservation-copy locations, source-to-derivative lineage, consent, takedown, quality gates, approved releases, and preservation assessments are implemented. Supabase is registered only as the operational location; independent preservation copies remain an owner-approved next step.
@@ -27,8 +28,9 @@ The remaining security-advisor warning is Supabase Auth leaked-password protecti
 - The project retains only `SUPABASE_URL` in Production and Development.
 - Automatically provisioned database passwords, service-role keys, secret keys, JWT secrets, anonymous/publishable keys, and browser-prefixed copies were removed because this proxy does not need them.
 - Voyage remains configured only in Supabase.
-- Preview is deployed from the implementation branch and must not be promoted until authentication and membership are established.
+- The archive interface now presents the La Pipa Documentary Archive itself—identity, place, origin evidence, activities, chronology, collection scale, first accession, and method—rather than inherited website-mock-up content.
+- Preview is deployed from the implementation branch and must not be promoted until interactive authentication and release acceptance are complete.
 
 ## Access bootstrap
 
-Alex Lawton explicitly declared archive ownership. The sole active confirmed Alex Auth identity was reconciled by immutable `auth.users.id` and assigned the active `owner` role in `kb.workspace_members`; editable user metadata is not used for authorization. Owner/editor users can run embeddings and owner/editor/reviewer/reader users can search. Interactive sign-in, recovery, session refresh, and client acceptance tests remain pending.
+Alex Lawton explicitly declared archive ownership. Both `alex@rmtv.io` and `lawton.alex@gmail.com` are confirmed Auth identities, reconciled by immutable `auth.users.id`, privately pre-authorized, and assigned the active `owner` role in `kb.workspace_members`; editable user metadata is not used for authorization. Both had zero sessions and no `last_sign_in_at` at verification, so the archive does not claim either is signed in. Owner/editor users can run embeddings and owner/editor/reviewer/reader users can search. Interactive sign-in, recovery, session refresh, and client acceptance tests remain pending.
