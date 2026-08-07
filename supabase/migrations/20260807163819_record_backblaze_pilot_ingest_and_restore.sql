@@ -57,15 +57,17 @@ begin
   from archive.storage_locations
   where location_id = 'LP-LOC-B2-EUC3-001';
 
-  if owner_user_key is null
-     or owner_agent_key is null
+  -- Preview branches and recovery databases intentionally omit production Auth
+  -- rows. Preservation evidence is portable; checked_by and audit actor fields
+  -- are nullable and retain the live owner UUID only where that identity exists.
+  if owner_agent_key is null
      or repository_agent_key is null
      or collection_key is null
      or source_key is null
      or accession_key is null
      or package_key is null
      or location_key is null then
-    raise exception 'Required owner, repository, collection, source, accession, package, or storage-location record is absent';
+    raise exception 'Required owner authority, repository, collection, source, accession, package, or storage-location record is absent';
   end if;
 
   insert into archive.items (
@@ -767,6 +769,7 @@ begin
            'fixity_passed', true,
            'restore_passed', true,
            'temporary_bridge_deleted', true,
+           'auth_actor_present', owner_user_key is not null,
            'evidence_document_id', 'LP-DOC-ARCH-024'
          )
   where not exists (

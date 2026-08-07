@@ -199,12 +199,17 @@ on conflict (question_id) do update set
 
 insert into ops.ingestion_jobs (
   job_id, job_type, status, initiated_by, input_manifest, counts
-)
-select
+) values (
   'LP-EMBED-PRESERVATION-2026-08-07',
   'voyage_contextual_embedding',
   'queued',
-  wm.user_id,
+  (
+    select wm.user_id
+    from kb.workspace_members wm
+    where wm.role = 'owner' and wm.active
+    order by wm.created_at
+    limit 1
+  ),
   jsonb_build_object(
     'source_id', 'LP-SRC-039',
     'document_id', 'lp-backblaze-pilot-ingest-restore-2026-08-07-v1',
@@ -216,10 +221,7 @@ select
     'controlled_one_time_trigger', true
   ),
   jsonb_build_object('expected_chunks', 4, 'embedded', 0, 'pending', 4)
-from kb.workspace_members wm
-where wm.role = 'owner' and wm.active
-order by wm.created_at
-limit 1
+)
 on conflict (job_id) do update set
   input_manifest = excluded.input_manifest,
   counts = case
@@ -444,7 +446,13 @@ insert into ops.audit_log (
   actor_user_id, actor_role, action, record_type, stable_record_id, details
 )
 select
-  wm.user_id,
+  (
+    select wm.user_id
+    from kb.workspace_members wm
+    where wm.role = 'owner' and wm.active
+    order by wm.created_at
+    limit 1
+  ),
   'owner',
   'preservation_evidence_rag_queued',
   'controlled_document',
@@ -456,17 +464,18 @@ select
     'provider', 'voyage',
     'model', 'voyage-context-4',
     'dimensions', 1024,
-    'temporary_edge_function_required', true
+    'temporary_edge_function_required', true,
+    'auth_actor_present', exists (
+      select 1 from kb.workspace_members wm
+      where wm.role = 'owner' and wm.active
+    )
   )
-from kb.workspace_members wm
-where wm.role = 'owner' and wm.active
-  and not exists (
+where not exists (
     select 1 from ops.audit_log
     where action = 'preservation_evidence_rag_queued'
       and stable_record_id = 'LP-DOC-ARCH-024'
   )
-order by wm.created_at
-limit 1;
+;
 
 insert into ops.schema_versions (version, description)
 values (
