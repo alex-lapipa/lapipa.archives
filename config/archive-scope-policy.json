@@ -1,0 +1,23 @@
+{
+  "schema": "https://lapipa.archive/schemas/source-scope-policy/v1",
+  "policy_id": "LP-SCOPE-2026-08-08-001",
+  "archive_name": "La Pipa Documentary Archive",
+  "platform_scope": {
+    "github_repository": "alex-lapipa/lapipa.archives",
+    "supabase_project_id": "jxilnxchvdeiazmopslf",
+    "vercel_project_id": "prj_avksBJw1Z3RIYBTQvs7m0ZbxKp4k"
+  },
+  "excluded_path_terms": [
+    {
+      "term": "vumi",
+      "reason": "Unrelated Remotive Media client material; explicitly excluded by the archive owner."
+    }
+  ],
+  "controls": {
+    "case_sensitive": false,
+    "reject_before_hashing": true,
+    "reject_before_copying": true,
+    "ambiguous_material": "quarantine_pending_owner_review",
+    "source_deletion": "forbidden_without_owner_approved_disposition"
+  }
+}

@@ -40,6 +40,7 @@ Archive package tools:
 
 ```sh
 npm run archive:inventory -- /path/to/source /path/to/inventory.json
+npm run archive:reconcile -- /path/to/reconciliation.json /path/to/inventory-1.json /path/to/inventory-2.json
 npm run archive:create-bag -- /path/to/source /path/to/LP-ACC-2026-0001
 npm run archive:validate-bag -- /path/to/LP-ACC-2026-0001
 npm run archive:validate-website -- data/accessions/LP-WEB-2026-08-05

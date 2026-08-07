@@ -46,8 +46,9 @@ export async function resolveAccessionInput(input) {
   throw new Error("accession input must be a regular file or directory");
 }
 
-export async function inventoryInput(input) {
-  if (input.input_type === "directory") return inventoryDirectory(input.path);
+export async function inventoryInput(input, options = {}) {
+  options.assertPathAllowed?.(input.path);
+  if (input.input_type === "directory") return inventoryDirectory(input.path, options);
   const stat = await lstat(input.path);
   return [{
     path: basename(input.path),
@@ -57,34 +58,39 @@ export async function inventoryInput(input) {
   }];
 }
 
-export async function inventoryDirectory(root) {
-  const records = [];
+export async function inventoryDirectory(root, options = {}) {
+  const files = [];
   async function visit(directory) {
     const entries = await readdir(directory, { withFileTypes: true });
     entries.sort((a, b) => a.name.localeCompare(b.name, "en"));
     for (const entry of entries) {
       const absolutePath = resolve(directory, entry.name);
       const archivePath = posixRelative(root, absolutePath);
+      options.assertPathAllowed?.(archivePath);
       if (entry.isSymbolicLink()) throw new Error(`symbolic links are not accepted: ${archivePath}`);
       if (entry.isDirectory()) {
         await visit(absolutePath);
         continue;
       }
       if (!entry.isFile()) throw new Error(`unsupported filesystem object: ${archivePath}`);
-      const stat = await lstat(absolutePath);
-      records.push({
-        path: archivePath,
-        byte_count: stat.size,
-        sha256: await sha256File(absolutePath),
-        modified_at: stat.mtime.toISOString(),
-      });
+      files.push({ absolutePath, archivePath });
     }
   }
   await visit(root);
+  const records = [];
+  for (const file of files) {
+      const stat = await lstat(file.absolutePath);
+      records.push({
+        path: file.archivePath,
+        byte_count: stat.size,
+        sha256: await sha256File(file.absolutePath),
+        modified_at: stat.mtime.toISOString(),
+      });
+  }
   return records;
 }
 
-export function manifestEnvelope(root, records, createdAt = new Date().toISOString(), packageLabel = basename(root)) {
+export function manifestEnvelope(root, records, createdAt = new Date().toISOString(), packageLabel = basename(root), scope = null) {
   return {
     schema: MANIFEST_SCHEMA,
     package_label: packageLabel,
@@ -92,6 +98,7 @@ export function manifestEnvelope(root, records, createdAt = new Date().toISOStri
     digest_algorithm: "sha256",
     file_count: records.length,
     byte_count: records.reduce((sum, record) => sum + record.byte_count, 0),
+    ...(scope ? { scope } : {}),
     records,
   };
 }

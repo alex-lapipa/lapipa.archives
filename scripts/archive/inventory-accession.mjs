@@ -1,6 +1,7 @@
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { inventoryInput, isWithin, manifestEnvelope, resolveAccessionInput } from "./lib.mjs";
+import { assertArchivePathAllowed, loadArchiveScopePolicy, manifestScope } from "./scope-policy.mjs";
 
 const [inputArg, outputArg] = process.argv.slice(2);
 if (!inputArg || !outputArg) {
@@ -9,13 +10,27 @@ if (!inputArg || !outputArg) {
 }
 
 const input = await resolveAccessionInput(inputArg);
+const scopePolicy = await loadArchiveScopePolicy();
 const output = resolve(outputArg);
 if (output === input.path || (input.input_type === "directory" && isWithin(input.path, output))) {
   throw new Error("inventory output must be outside the accession input");
 }
 
-const records = await inventoryInput(input);
-const envelope = manifestEnvelope(input.root, records, new Date().toISOString(), input.package_label);
+const records = await inventoryInput(input, {
+  assertPathAllowed: (path) => assertArchivePathAllowed(path, scopePolicy),
+});
+const envelope = manifestEnvelope(
+  input.root,
+  records,
+  new Date().toISOString(),
+  input.package_label,
+  manifestScope(scopePolicy),
+);
+envelope.source = {
+  input_path: input.path,
+  root: input.root,
+  input_type: input.input_type,
+};
 await mkdir(dirname(output), { recursive: true });
 const temporary = `${output}.tmp-${process.pid}`;
 await writeFile(temporary, `${JSON.stringify(envelope, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
