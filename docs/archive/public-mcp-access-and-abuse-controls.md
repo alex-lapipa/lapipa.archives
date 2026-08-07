@@ -74,6 +74,8 @@ The empty public-event result is intentional until this review occurs.
 
 The daily limit can be changed through the server-only `MCP_DAILY_VOYAGE_LIMIT` Edge Function secret. A change is an operational decision and must be recorded; no limit value belongs in browser or Vercel configuration.
 
+All four operational control tables have RLS enabled, no client grants, and explicit restrictive deny-all policies for `anon` and `authenticated`. Only the service role can execute their bounded control functions.
+
 ## Privacy and logs
 
 The client limiter derives a one-way SHA-256 identifier from the source network address and a server credential. The raw address is never stored. Rotating the server credential changes future identifiers.
