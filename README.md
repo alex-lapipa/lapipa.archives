@@ -21,8 +21,9 @@ Edge Functions:
 
 - `kb-search`: authenticated Voyage query embedding plus hybrid retrieval.
 - `kb-embed`: owner/editor-only contextual embedding of approved chunks.
+- `b2-preservation-status`: owner/editor-only, read-only verification of the configured Backblaze credential pair, exact bucket, endpoint, and preservation controls; responses are sanitized and object operations are excluded.
 
-`VOYAGE_API_KEY` is a server-side Supabase secret. Never copy it into Vercel, a browser, GitHub, Notion, or logs.
+`VOYAGE_API_KEY` and the Backblaze integration credentials are server-side Supabase Edge Function secrets. Never copy them into Vercel, a browser, GitHub, Notion, Database Vault, RAG chunks, or logs.
 
 ## Local checks
 
@@ -30,6 +31,7 @@ Edge Functions:
 npm run check
 npm run validate
 npm test
+npm run test:edge
 npm run build
 supabase functions serve kb-search --env-file .env.local
 ```

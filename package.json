@@ -7,6 +7,7 @@
     "build": "node scripts/build.mjs",
     "check": "node --check api/health.mjs && node --check api/search.mjs && node --check scripts/build.mjs && node --check scripts/validate-repository.mjs && node --check scripts/archive/lib.mjs && node --check scripts/archive/inventory-accession.mjs && node --check scripts/archive/create-bag.mjs && node --check scripts/archive/validate-bag.mjs && node --check scripts/archive/build-website-accession.mjs && node --check scripts/archive/validate-website-accession.mjs",
     "test": "node --test",
+    "test:edge": "deno test --no-lock --allow-env supabase/functions/_shared/backblaze_checks.ts && deno check --no-lock --node-modules-dir=auto supabase/functions/b2-preservation-status/index.ts",
     "validate": "node scripts/validate-repository.mjs",
     "archive:inventory": "node scripts/archive/inventory-accession.mjs",
     "archive:create-bag": "node scripts/archive/create-bag.mjs",

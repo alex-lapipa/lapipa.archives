@@ -1,8 +1,10 @@
 # Storage and replication plan
 
-## Current truth
+## Current truth — 7 August 2026
 
-Supabase in `eu-west-1` is the configured operational object store. It is private and access-controlled, but it is one provider and one administrative failure domain. It must not be described as a complete preservation strategy.
+Supabase in `eu-west-1` is the configured operational object store. Backblaze B2 in `eu-central-003` is now a separately provided, private, encrypted, S3-compatible location whose credential pair, exact bucket, endpoint, privacy mode, encryption metadata, and Object Lock metadata have passed a read-only connection test.
+
+No archive object has yet been copied to Backblaze, fixity-verified there, or restored from it. The B2 location therefore does not yet count as a verified independent preservation copy. Object Lock is disabled and the current broad application key includes delete authority; those controls must be addressed before routine replication.
 
 ## Target topology
 
@@ -25,7 +27,7 @@ The archive records each copy separately. A replicated provider service is not a
 - credible exit path with hashes and metadata intact;
 - environmental and cost sustainability over at least five years.
 
-No provider is selected merely because it is convenient or already connected.
+Backblaze B2 is selected for the first independent online preservation pilot because it is outside the Supabase provider domain, exposes interoperable S3 and native APIs, supports open tooling, and can support versioning and Object Lock when configured appropriately. Selection does not by itself establish preservation success.
 
 ## Copy evidence
 
@@ -43,6 +45,10 @@ No provider is selected merely because it is convenient or already connected.
 
 Provider credentials remain in the owning platform’s secrets facility, never Notion, GitHub, Vercel browser code, RAG chunks, logs, or release packages. Use distinct scoped identities for copying, verification, restoration, and deletion where supported. Deletion authority should require stronger control than read or replication authority.
 
-## Pending owner decision
+The current Backblaze credential is stored only in Supabase Edge Function secrets. The old Database Vault copies were deleted after replacement. The retained connection-status function never returns credential material and is protected by both Supabase JWT verification and the La Pipa workspace role check.
 
-An external preservation location will create cost and a new security relationship. The archive owner must approve the provider, region, retention, object-lock period, annual cost ceiling, responsible account, and recovery owner before configuration.
+## Approved pilot and pending preservation decisions
+
+The archive owner approved proceeding with Backblaze B2 as the initial independent-storage pilot. The sanitized verification record is [Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md).
+
+Before production replication, the owner must still approve the final bucket, versioning and Object Lock design, retention period, annual cost ceiling, recovery owner, and break-glass process. The routine replication and verification keys should be bucket-scoped and should not have delete authority. The pilot must complete upload, fixity, restore, and evidence-recording gates before it is counted toward the three-copy target.

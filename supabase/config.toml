@@ -6,3 +6,5 @@ verify_jwt = true
 [functions.kb-embed]
 verify_jwt = true
 
+[functions.b2-preservation-status]
+verify_jwt = true
