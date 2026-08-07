@@ -2,10 +2,12 @@
   "name": "lapipa-archives",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": "24.x" },
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node --check api/health.mjs && node --check api/search.mjs && node --check scripts/build.mjs && node --check scripts/validate-repository.mjs && node --check scripts/verify-public-mcp.mjs && node --check scripts/archive/lib.mjs && node --check scripts/archive/inventory-accession.mjs && node --check scripts/archive/create-bag.mjs && node --check scripts/archive/validate-bag.mjs && node --check scripts/archive/build-website-accession.mjs && node --check scripts/archive/validate-website-accession.mjs",
+    "check": "node --check api/client-config.mjs && node --check api/health.mjs && node --check api/search.mjs && node --check site/app.mjs && node --check site/archive-client.mjs && node --check scripts/build.mjs && node --check scripts/validate-repository.mjs && node --check scripts/verify-public-mcp.mjs && node --check scripts/archive/lib.mjs && node --check scripts/archive/inventory-accession.mjs && node --check scripts/archive/create-bag.mjs && node --check scripts/archive/validate-bag.mjs && node --check scripts/archive/build-website-accession.mjs && node --check scripts/archive/validate-website-accession.mjs",
     "test": "node --test",
     "test:edge": "deno test --no-lock --allow-env supabase/functions/_shared/backblaze_checks.ts supabase/functions/_shared/pipa_mcp_checks.ts && deno check --no-lock --node-modules-dir=auto supabase/functions/b2-preservation-status/index.ts supabase/functions/pipa-mcp/index.ts",
     "verify:mcp:public": "node scripts/verify-public-mcp.mjs",
@@ -15,5 +17,11 @@
     "archive:validate-bag": "node scripts/archive/validate-bag.mjs",
     "archive:validate-website": "node scripts/archive/validate-website-accession.mjs",
     "vercel-build": "npm run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }

@@ -18,6 +18,9 @@ const required = [
   "docs/archive/README.md",
   "docs/archive/metadata-application-profile.md",
   "docs/corpus/LA_PIPA_RAG_MASTER.md",
+  "api/client-config.mjs",
+  "site/app.mjs",
+  "site/archive-client.mjs",
   "supabase/config.toml",
   "vercel.json",
 ];

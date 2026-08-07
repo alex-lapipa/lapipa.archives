@@ -19,8 +19,9 @@
         <a href="#timeline">Timeline</a>
         <a href="#archive">The archive</a>
         <a href="#status">Status</a>
+        <a href="#owner-access">Owner access</a>
       </nav>
-      <a class="mast-cta" href="#status">Archive status</a>
+      <a class="mast-cta" href="#owner-access">Owner access</a>
     </div>
   </header>
 
@@ -133,16 +134,16 @@
 
     <section class="plate paper-two" id="status">
       <div class="wrap">
-        <div class="section-head reveal"><span class="number">Nº 05</span><h2>Foundation status.</h2><span class="meta">5 August 2026 / controlled release</span></div>
+        <div class="section-head reveal"><span class="number">Nº 05</span><h2>Foundation status.</h2><span class="meta">7 August 2026 / controlled working archive</span></div>
         <div class="stats reveal" aria-label="Current archive counts">
           <div><strong>2.3 TB</strong><span>source archive boundary</span></div>
           <div><strong>188K</strong><span>files inventoried</span></div>
-          <div><strong>35</strong><span>reviewed provenance sources</span></div>
-          <div><strong>19</strong><span>retrievable evidence chunks</span></div>
+          <div><strong>262</strong><span>provenance sources registered</span></div>
+          <div><strong>355</strong><span>active Voyage-indexed chunks</span></div>
           <div><strong>01</strong><span>validated accession package</span></div>
           <div><strong>02</strong><span>authorized owner identities</span></div>
         </div>
-        <p class="status-note reveal"><b>Official internal documentary foundation—not yet a public repository.</b> Alex Lawton is the accountable archive owner. The 2019 origin deck is preserved in validated package <b>LP-BAG-2026-0001</b>. Managed-storage ingest, malware clearance, rights review, independent copies, tested recovery, and an owner-approved public release remain explicit gates.</p>
+        <p class="status-note reveal"><b>Official documentary foundation and public narrative—not yet an open repository.</b> Alex Lawton is the accountable archive owner. The 2019 origin deck is preserved in validated package <b>LP-BAG-2026-0001</b>, independently replicated to private Backblaze storage, and clean-restored with matching SHA-256 evidence. Rights, privacy, consent, accessibility, and owner-approved release remain separate gates for every public object.</p>
       </div>
     </section>
 
@@ -156,6 +157,53 @@
           <article><b>04 / EVIDENCE</b><h3>Verify</h3><p>Mark claims as verified, attributed, filename-only, unresolved, or contradicted. Never flatten the differences.</p></article>
           <article><b>05 / DISCOVERY</b><h3>Connect</h3><p>Use a provenance graph and access-aware Voyage retrieval to find relationships with citations back to sources.</p></article>
           <article><b>06 / PUBLICATION</b><h3>Share responsibly</h3><p>Resolve rights, privacy, credits, sensitivity, accessibility, correction, and takedown before release.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="owner-access" id="owner-access" aria-labelledby="owner-access-title">
+      <div class="wrap owner-access-grid">
+        <div class="owner-access-intro reveal">
+          <p class="kick light">Controlled workspace · owner only</p>
+          <h2 id="owner-access-title">Enter the<br>working archive.</h2>
+          <p>The documentary record above remains readable without an account. The working archive requires a confirmed, pre-authorized owner identity and a single-use email link.</p>
+          <dl>
+            <div><dt>Identity</dt><dd>Supabase Auth</dd></div>
+            <div><dt>Authority</dt><dd>Immutable database membership</dd></div>
+            <div><dt>Retrieval</dt><dd>Voyage contextual search</dd></div>
+            <div><dt>Boundary</dt><dd>No public mutation access</dd></div>
+          </dl>
+        </div>
+
+        <div class="access-panel reveal" id="access-panel">
+          <div id="owner-signed-out">
+            <span class="access-eyebrow">01 / CONFIRM IDENTITY</span>
+            <h3>Owner sign-in</h3>
+            <p>No password is stored by this page. Enter one of the two owner addresses already bound to the archive.</p>
+            <form id="owner-auth-form" class="access-form">
+              <label for="owner-email">Owner email</label>
+              <input id="owner-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
+              <button id="owner-auth-submit" type="submit">Send one-time link →</button>
+            </form>
+            <p class="access-message" id="owner-auth-message" role="status" aria-live="polite">Preparing owner access…</p>
+          </div>
+
+          <div id="owner-signed-in" hidden>
+            <div class="access-session-head">
+              <div><span class="access-eyebrow">SESSION VERIFIED</span><h3 id="owner-identity">Confirmed owner</h3></div>
+              <span class="role-badge" id="owner-role">owner</span>
+            </div>
+            <form id="archive-search-form" class="archive-search-form">
+              <label for="archive-search-query">Ask the archive</label>
+              <textarea id="archive-search-query" name="query" rows="3" maxlength="4000" placeholder="What evidence describes the earliest formation of La Pipa?" required></textarea>
+              <div class="search-actions">
+                <button id="archive-search-submit" type="submit">Search evidence →</button>
+                <button id="owner-sign-out" class="button-secondary" type="button">Sign out</button>
+              </div>
+            </form>
+            <p class="access-message" id="archive-search-message" role="status" aria-live="polite"></p>
+            <div class="archive-search-results" id="archive-search-results" aria-live="polite"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -180,6 +228,7 @@
   <!-- LA PIPA conversational archive: ElevenLabs agent backed by the public-scope Supabase pipa-mcp RAG. -->
   <elevenlabs-convai agent-id="agent_5601kz7qnvkfebp9cfv6xskknm53"></elevenlabs-convai>
   <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+  <script src="/app.js" type="module"></script>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
