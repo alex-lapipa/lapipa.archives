@@ -5,7 +5,7 @@ Submission package: `LP-BAG-2026-0001`
 Source record: `LP-SRC-001`
 Owner: Alex Lawton
 Date: 2026-08-05
-Status: valid submission package; managed preservation ingest pending
+Status: valid submission package; malware pass and format validation complete with warnings; managed preservation ingest pending
 
 ## Object
 
@@ -37,13 +37,15 @@ Automated tests also prove that the validator detects changed payload bytes and 
 
 ## Technical characterization
 
-Read-only inspection identifies a 36-page, unencrypted PDF created from PowerPoint on 10 June 2019 and modified on 11 March 2020. It contains no embedded JavaScript. It is not tagged for accessibility and is not optimized. The `file` command reported PDF 1.3 while Poppler `pdfinfo` reported PDF 1.4; this discrepancy remains for deep validation. qpdf, ExifTool, and ClamAV were unavailable, so structural conformance and malware clearance remain pending.
+Read-only inspection identifies a 36-page, unencrypted PDF created from PowerPoint on 10 June 2019 and modified on 11 March 2020. It contains no embedded JavaScript. It is not tagged for accessibility and is not optimized.
+
+On 7 August 2026, ClamAV 1.5.3 scanned the complete payload using official, digitally verified databases current on the scan date and found zero infected files. qpdf 12.3.2 completed its check with five recoverable object-offset warnings and no fatal structural error. qpdf and `file` report PDF 1.3, while ExifTool 13.55 and Poppler `pdfinfo` 26.05.0 report PDF 1.4 metadata. The original remains unchanged; the discrepancy and warnings are retained as preservation evidence. See [LP-DOC-ARCH-023](pilot-malware-and-format-validation-2026-08-07.md).
 
 Characterization evidence SHA-256: `2c3a4d28cb4fcae9739c199a5b417164f2b19be6517ef0d6c499938cd7c9e588`.
 
 ## Database evidence
 
-The database records the accession, source and repository agents, transfer package, payload disposition, custody event, preservation validation event, owner audit event, and outstanding work. The payload is accepted into the valid submission package but is not yet represented as a managed `archive.file_objects` object because it has not been uploaded to verified archive storage or malware-scanned.
+The database records the accession, source and repository agents, transfer package, payload disposition, custody event, package validation, malware result, format validation, owner audit event, and outstanding work. The payload is accepted into the valid submission package but is not yet represented as a managed `archive.file_objects` object because it has not been uploaded to verified archive storage.
 
 ## Restrictions and remaining gates
 
@@ -51,10 +53,9 @@ The object remains restricted. The following must precede file-object registrati
 
 1. Upload to a private managed archive bucket without exposing a service credential. The standard CLI upload was attempted and returned HTTP 413 for the 194 MB payload; three partial tag objects were removed and the remote prefix was verified empty. Use TUS resumable upload or S3 multipart upload next.
 2. Recalculate SHA-256 after upload and reconcile it to the received-state digest.
-3. Run malware scanning and format identification; retain tool versions and results.
-4. Register the original representation, file object, operational copy, and fixity event.
-5. Complete copyright, privacy, sensitivity, and publication review.
-6. Create an independent preservation copy and perform a clean restore test.
-7. Approve only eligible descriptive text for Voyage ingestion; keep payload access restricted by default.
+3. Register the original representation, file object, operational copy, and fixity event.
+4. Complete copyright, privacy, sensitivity, and publication review.
+5. Create an independent preservation copy and perform a clean restore test.
+6. Approve only eligible descriptive text for Voyage ingestion; keep payload access restricted by default.
 
 This report does not claim a complete preservation accession, independent redundancy, cleared rights, or public-release readiness.

@@ -20,7 +20,7 @@ Preservation maturity is **not yet demonstrated** because no archival payload ha
 - A BagIt 1.0 SHA-256 package creator, payload/tag validator, and read-only source inventory tool with automated tests.
 - A valid first submission package, `LP-BAG-2026-0001`: one 2019 origin-deck PDF, 194,031,448 bytes, with zero validation failures.
 - Transfer-package, file-copy, derivative-lineage, consent, takedown, quality-control, release, and assessment records.
-- Fifteen controlled documentary archive documents in Notion and GitHub.
+- Twenty-three controlled documentary archive documents synchronized across GitHub and the official Notion knowledge base.
 - Thirty-five reviewed knowledge sources and nineteen contextual Voyage embeddings with provenance links.
 
 ## Category findings
@@ -31,7 +31,7 @@ Not yet demonstrated. One operational storage service is configured. No geograph
 
 ### Integrity
 
-Pilot package evidence established; managed-copy evidence pending. SHA-256, fixity checks, package manifests, preservation events, copy verification, and failure states are modeled and tested. One real source file has been inventoried read-only and packaged successfully; managed-storage ingest, malware scanning, file-object registration, independent copying, and restoration remain outstanding.
+Pilot package, malware, and format evidence established; managed-copy evidence pending. SHA-256, fixity checks, package manifests, preservation events, copy verification, and failure states are modeled and tested. One real source file has been inventoried read-only, packaged successfully, scanned with current official malware signatures, and structurally validated with documented recoverable warnings; managed-storage ingest, file-object registration, independent copying, and restoration remain outstanding.
 
 ### Control
 
@@ -48,7 +48,7 @@ Policy documented; operating evidence pending. Format characterization, original
 ## Priority gaps
 
 1. Complete Alex Lawton's interactive sign-in, recovery, and session acceptance tests; designate a backup administrator.
-2. Ingest validated `LP-BAG-2026-0001` into managed storage, scan and characterize it, register its file object, and complete rights and restore review.
+2. Ingest validated `LP-BAG-2026-0001` into managed storage, register its file object, and complete rights and restore review.
 3. Select and configure an independent preservation replica with owner-approved cost and jurisdiction.
 4. Establish an offline or logically isolated copy.
 5. Run and record sample restore tests.
