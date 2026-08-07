@@ -1,4 +1,4 @@
-# Implementation status — 5 August 2026
+# Implementation status — 7 August 2026
 
 ## Supabase
 
@@ -11,11 +11,12 @@
 - Provenance validation: zero chunks without sources and zero claims without sources.
 - RLS validation: enabled on every archive table.
 - Direct authenticated table grants: zero; access is through a minimal checked RPC surface.
-- Edge Functions: `kb-search` and `kb-embed`, both active with JWT verification.
+- Edge Functions: `kb-search`, `kb-embed`, and `b2-preservation-status`, all active with JWT verification. The Backblaze function also requires an active La Pipa `owner` or `editor` role and returns only sanitized control metadata.
 - Identity governance: `kb.authorized_identities` privately records pre-authorization, immutable Auth binding, and sign-in evidence as separate states. Both Alex Lawton identities are confirmed, active owners and currently `bound_confirmed`; neither had signed in at verification.
 - Temporary bootstrap function and temporary bootstrap secret: removed after the controlled embedding seed.
 - Documentary archive: LP-MAP 1.0 collection hierarchy, item, representation, file, AV track, transcript, rights, PREMIS-style event, fixity, accession, and custody structures are implemented. The root archival control record is `LP-ARCHIVE-001`.
-- Operating controls: BagIt transfer packages, preservation-copy locations, source-to-derivative lineage, consent, takedown, quality gates, approved releases, and preservation assessments are implemented. Supabase is registered only as the operational location; independent preservation copies remain an owner-approved next step.
+- Operating controls: BagIt transfer packages, preservation-copy locations, source-to-derivative lineage, consent, takedown, quality gates, approved releases, and preservation assessments are implemented. Supabase is registered as the operational location. Backblaze B2 location `LP-LOC-B2-EUC3-001` passed read-only credential, exact-bucket, endpoint, privacy, S3, encryption, and Object Lock metadata checks on 7 August 2026. No object has yet been copied, fixity-verified, or restored there, so it is not yet counted as a verified preservation copy.
+- Backblaze controls: bucket `miramonte-lapipa-preservation-pilot` is private and encrypted at rest in `eu-central-003`; Object Lock is disabled. The current deliberately broad key is unrestricted and includes delete authority. Production replication requires bucket-scoped non-delete identities plus a recorded pilot copy, fixity check, and restore.
 - First accession evidence: `LP-ACC-2026-0001` and valid BagIt submission package `LP-BAG-2026-0001` contain the 2019 origin-deck PDF (1 file; 194,031,448 bytes). Managed-storage ingest, malware scanning, file-object registration, rights review, independent replication, and restore testing remain pending.
 - Repository assurance: locked Node 24 build, dependency audit, archive tooling tests, local-link and migration validation, pinned GitHub Actions, Dependabot, and a preservation-aware pull-request checklist.
 - Preservation assessment: `LP-ASSESS-2026-0001` records a conservative NDSA Levels 2.1 baseline. No maturity level is claimed because no real archival payload, independent replica, isolated copy, or restore test has yet completed the workflow.

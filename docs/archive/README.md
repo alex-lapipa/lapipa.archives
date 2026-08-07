@@ -34,6 +34,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 19. [First accession report](first-accession-report.md)
 20. [Website and media accession — 5 August 2026](website-accession-2026-08-05.md)
 21. [Rights ownership declaration](rights-ownership-declaration.md)
+22. [Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md)
 
 ## Standards profile
 
@@ -65,7 +66,7 @@ The implementation is an application profile, not a claim of formal certificatio
 
 ## Current maturity boundary
 
-The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, and an assigned human owner. It does not yet claim trustworthy digital repository certification, geographic redundancy, preservation-format normalization for all media, or public availability. Those outcomes require operating evidence, a backup administrator, tested recovery, and continuing review.
+The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, an assigned human owner, and a tested connection to a separately provided Backblaze B2 preservation location. It does not yet claim a verified independent preservation copy, trustworthy digital repository certification, full geographic redundancy, preservation-format normalization for all media, or public availability. Those outcomes require copied and fixity-verified objects, tested recovery, an isolated third copy, a backup administrator, and continuing review.
 
 ## Authoritative references
 

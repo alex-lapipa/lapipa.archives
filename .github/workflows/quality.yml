@@ -38,6 +38,14 @@ jobs:
       - name: Archive tooling tests
         run: npm test
 
+      - name: Use Deno 2.4.3
+        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb
+        with:
+          deno-version: v2.4.3
+
+      - name: Edge Function tests and type checks
+        run: npm run test:edge
+
       - name: Production build
         run: npm run build
 
