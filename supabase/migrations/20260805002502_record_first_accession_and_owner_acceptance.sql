@@ -10,14 +10,9 @@ declare
   accession_key bigint;
   package_key bigint;
 begin
-  if not exists (
-    select 1 from kb.workspace_members
-    where user_id = owner_user_id and role = 'owner' and active
-  ) then
-    raise notice 'Archive owner is absent in this environment; accession evidence seed skipped.';
-    return;
-  end if;
-
+  -- Accession and preservation evidence must replay independently of production
+  -- Auth data. A preview or recovery database may legitimately have no Auth
+  -- users; environment-specific authorization evidence remains conditional.
   select id into owner_agent_id
   from archive.agents where agent_id = 'LP-AGENT-ALEX-LAWTON';
   select id into collection_key
@@ -160,18 +155,26 @@ begin
     select 1 from ops.audit_log
     where action = 'owner_database_authorization_accepted'
       and stable_record_id = owner_user_id::text
-  );
+  )
+    and exists (
+      select 1 from kb.workspace_members
+      where user_id = owner_user_id and role = 'owner' and active
+    );
 
   insert into ops.audit_log (
     actor_user_id, actor_role, action, record_type, stable_record_id, details
   )
-  select owner_user_id, 'owner', 'submission_package_validated',
+  select (select id from auth.users where id = owner_user_id),
+         'owner', 'submission_package_validated',
          'transfer_package', 'LP-BAG-2026-0001',
          jsonb_build_object(
            'accession_id','LP-ACC-2026-0001',
            'source_id','LP-SRC-001',
            'valid',true,
-           'managed_storage_pending',true
+           'managed_storage_pending',true,
+           'auth_actor_present', exists (
+             select 1 from auth.users where id = owner_user_id
+           )
          )
   where not exists (
     select 1 from ops.audit_log

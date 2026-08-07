@@ -4,19 +4,23 @@ do $$
 declare
   owner_user_id constant uuid := '827fa26f-df7f-4d24-9521-0e44bcf37696';
   owner_entity_id bigint;
+  owner_auth_present boolean;
 begin
-  if not exists (
+  select exists (
     select 1 from auth.users
     where id = owner_user_id and deleted_at is null and confirmed_at is not null
-  ) then
-    raise notice 'Archive owner Auth identity is absent in this environment; owner bootstrap skipped.';
-    return;
-  end if;
+  ) into owner_auth_present;
 
-  insert into kb.workspace_members (user_id, role, active)
-  values (owner_user_id, 'owner', true)
-  on conflict (user_id) do update
-  set role = excluded.role, active = true, updated_at = now();
+  -- Preview branches and database restores intentionally do not copy production
+  -- Auth rows. Keep the documentary authority record replayable everywhere,
+  -- while only granting a live workspace role when the confirmed Auth identity
+  -- is present in this environment.
+  if owner_auth_present then
+    insert into kb.workspace_members (user_id, role, active)
+    values (owner_user_id, 'owner', true)
+    on conflict (user_id) do update
+    set role = excluded.role, active = true, updated_at = now();
+  end if;
 
   select id into owner_entity_id
   from kb.entities where entity_id = 'person:alex-lawton';
@@ -32,7 +36,10 @@ begin
       'governance_role', 'archive_owner',
       'evidence_class', 'user_supplied_and_live_identity_reconciled',
       'declared_at', '2026-08-05',
-      'auth_binding', 'kb.workspace_members'
+      'auth_binding', case
+        when owner_auth_present then 'kb.workspace_members'
+        else 'environment_specific_auth_binding_absent'
+      end
     )
   )
   on conflict (agent_id) do update
@@ -46,11 +53,16 @@ begin
   insert into ops.audit_log (
     actor_user_id, actor_role, action, record_type, stable_record_id, details
   )
-  select owner_user_id, 'owner', 'archive_owner_bootstrapped', 'workspace_member',
+  select case when owner_auth_present then owner_user_id else null end,
+         'owner', 'archive_owner_bootstrapped', 'workspace_member',
          owner_user_id::text,
          jsonb_build_object(
            'authorized_name', 'Alex Lawton',
-           'method', 'owner_declaration_plus_confirmed_auth_uuid',
+           'method', case
+             when owner_auth_present then 'owner_declaration_plus_confirmed_auth_uuid'
+             else 'owner_declaration_auth_binding_pending_in_environment'
+           end,
+           'auth_actor_present', owner_auth_present,
            'migration', 'bootstrap_archive_owner_alex_lawton'
          )
   where not exists (
@@ -64,13 +76,13 @@ begin
   ) values
     ('LP-REV-OWNER-BACKUP-2026-001', 'governance', 'archive-owner-backup',
      'Designate and verify a second trusted administrator; no role is granted until the owner identifies the person and their exact Auth UUID.',
-     'open', owner_user_id),
+     'open', case when owner_auth_present then owner_user_id else null end),
     ('LP-REV-FIRST-ACCESSION-2026-001', 'accession', 'LP-ACC-2026-0001',
      'Locate and approve the 2019 origin deck source directory for read-only inventory and first controlled accession.',
-     'open', owner_user_id),
+     'open', case when owner_auth_present then owner_user_id else null end),
     ('LP-REV-PRESERVATION-STORAGE-2026-001', 'storage_location', 'independent-preservation-copy',
      'Select an administratively independent preservation provider and approve jurisdiction, immutability, recovery, egress, and cost before configuration.',
-     'open', owner_user_id)
+     'open', case when owner_auth_present then owner_user_id else null end)
   on conflict (review_id) do update
   set assigned_to = excluded.assigned_to, reason = excluded.reason;
 
@@ -81,7 +93,10 @@ begin
       ),
       evidence = evidence || jsonb_build_object(
         'owner_identity_assigned', true,
-        'owner_auth_binding', 'confirmed_auth_uuid',
+        'owner_auth_binding', case
+          when owner_auth_present then 'confirmed_auth_uuid'
+          else 'environment_specific_auth_binding_absent'
+        end,
         'owner_agent_id', 'LP-AGENT-ALEX-LAWTON'
       ),
       gaps = (

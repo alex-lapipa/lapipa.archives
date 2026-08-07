@@ -5,7 +5,7 @@ Submission package: `LP-BAG-2026-0001`
 Source record: `LP-SRC-001`
 Owner: Alex Lawton
 Date: 2026-08-05
-Status: valid submission package; malware pass and format validation complete with warnings; managed preservation ingest pending
+Status: ingested; malware pass; format validation complete with warnings; Backblaze replication, fixity, and clean restore passed; release review open
 
 ## Object
 
@@ -45,17 +45,26 @@ Characterization evidence SHA-256: `2c3a4d28cb4fcae9739c199a5b417164f2b19be6517e
 
 ## Database evidence
 
-The database records the accession, source and repository agents, transfer package, payload disposition, custody event, package validation, malware result, format validation, owner audit event, and outstanding work. The payload is accepted into the valid submission package but is not yet represented as a managed `archive.file_objects` object because it has not been uploaded to verified archive storage.
+The database records the accession, source and repository agents, transfer package, payload disposition, custody event, package validation, malware result, format validation, rights basis, owner audit events, and outstanding work. The ingest completed on 7 August 2026 and now records:
+
+- item `LP-ITEM-2026-0001`, restricted and at review status;
+- original representation `LP-REP-2026-0001` and BagIt metadata representation `LP-REP-2026-0002`;
+- file objects `LP-FILE-2026-0001` through `LP-FILE-2026-0005`;
+- encrypted Backblaze copies `LP-COPY-B2-2026-0001` through `LP-COPY-B2-2026-0005`, each with an exact version ID;
+- passing fixity checks `LP-FIXITY-2026-0001` through `LP-FIXITY-2026-0005`; and
+- successful replication, fixity, restore, and ingest events `LP-PRESEVENT-2026-0006` through `LP-PRESEVENT-2026-0009`.
+
+See [LP-DOC-ARCH-024](backblaze-pilot-ingest-and-restore-2026-08-07.md) for the complete preservation evidence.
 
 ## Restrictions and remaining gates
 
-The object remains restricted. The following must precede file-object registration or release:
+The object remains restricted. Managed ingest, independent online replication, SHA-256 comparison, file-object registration, and clean restoration are complete. The following remain open:
 
-1. Upload to a private managed archive bucket without exposing a service credential. The standard CLI upload was attempted and returned HTTP 413 for the 194 MB payload; three partial tag objects were removed and the remote prefix was verified empty. Use TUS resumable upload or S3 multipart upload next.
-2. Recalculate SHA-256 after upload and reconcile it to the received-state digest.
-3. Register the original representation, file object, operational copy, and fixity event.
-4. Complete copyright, privacy, sensitivity, and publication review.
-5. Create an independent preservation copy and perform a clean restore test.
+1. Complete sensitivity, privacy, consent, accessibility, citation, and owner-approved publication review.
+2. Approve Backblaze Object Lock and retention policy.
+3. Replace the broad setup credential with separated least-privilege replication, verification, and deletion identities before routine unattended automation.
+4. Establish an offline or logically isolated third copy.
+5. Perform the next recorded Backblaze fixity and restore sample by 5 November 2026.
 6. Approve only eligible descriptive text for Voyage ingestion; keep payload access restricted by default.
 
-This report does not claim a complete preservation accession, independent redundancy, cleared rights, or public-release readiness.
+This report claims one completed, evidence-backed preservation ingest and one tested independent online copy. It does not claim full three-copy redundancy, cleared public-release rights, collection-wide preservation maturity, or repository certification.
