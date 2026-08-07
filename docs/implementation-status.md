@@ -3,16 +3,16 @@
 ## Supabase
 
 - Project: `jxilnxchvdeiazmopslf` (`LA PIPA ARCHIVE`)
-- Schemas: `archive` (32 preservation and documentary-control tables), `kb` (15), `kg` (3), `rag` (5), `ops` (6), plus private authorization helpers.
+- Schemas after the public-MCP control migration: `archive` (32 preservation and documentary-control tables), `kb` (16), `kg` (3), `rag` (5), `ops` (10), plus private authorization helpers.
 - Reviewed seed: 35 sources, 9 claims, 14 entities, 9 events, 11 relationships, 19 chunks, and 8 evaluation questions.
-- Voyage: 351 active content-hash-matching contextual embeddings using `voyage-context-4` at 1,024 dimensions: 19 reviewed foundation chunks, 327 website/media chunks, one rights-declaration chunk, and four preservation-ingest evidence chunks.
+- Voyage: 351 active content-hash-matching contextual embeddings using `voyage-context-4` at 1,024 dimensions: 19 reviewed foundation chunks, 327 website/media chunks, one rights-declaration chunk, and four preservation-ingest evidence chunks. Four restricted `LP-DOC-ARCH-025` control chunks are registered with a truthful queued production-embedding job; clean previews do not issue a paid Voyage request.
 - Website accession `LP-ACC-2026-0002` is live and reconciled: 52 current pages, 55 legacy export records, 117 external-media records, 26 captured YouTube transcripts, 224 archive items, and 327 deterministic chunks. All 327 chunks have content-hash-matching `voyage-context-4` embeddings at 1,024 dimensions; zero are missing or stale. The tightly bounded one-time trigger was deleted immediately after success, and the accession-specific service-role RPCs are removed by the finalization migration.
 - Storage: `source-originals`, `source-derivatives`, `knowledge-exports`, `preservation-masters`, and `access-media`; all private.
 - Provenance validation: zero chunks without sources and zero claims without sources.
 - Controlled preservation RAG: `LP-SRC-039`, document `lp-backblaze-pilot-ingest-restore-2026-08-07-v1`, and chunks `LP-RAG-021` through `LP-RAG-024` are live, source-linked, restricted, and embedded. Job `LP-EMBED-PRESERVATION-2026-08-07` succeeded with four embedded and zero pending; its disposable Edge Function and service-role RPC surface were removed.
 - RLS validation: enabled on every archive table.
 - Direct authenticated table grants: zero; access is through a minimal checked RPC surface.
-- Edge Functions: `kb-search`, `kb-embed`, and `b2-preservation-status`, all active with JWT verification. The Backblaze function also requires an active La Pipa `owner` or `editor` role and returns only sanitized control metadata.
+- Edge Functions: `kb-search`, `kb-embed`, and `b2-preservation-status` require JWT verification. `pipa-mcp` is deliberately anonymous and read-only, but its PostgreSQL functions are server-only and enforce affirmative public scope across documents, chunks, sources, entities, relationship objects, events, locations, and participants. It has database-atomic per-client limits, a daily Voyage-attempt budget, a one-hour hash-keyed cache, bounded inputs, and privacy-preserving audit records. The nine pre-existing events remain internal pending `LP-REV-PUBLIC-EVENTS-2026-001`.
 - Identity governance: `kb.authorized_identities` privately records pre-authorization, immutable Auth binding, and sign-in evidence as separate states. Both Alex Lawton identities are confirmed, active owners and currently `bound_confirmed`; neither had signed in at verification.
 - Temporary bootstrap function and temporary bootstrap secret: removed after the controlled embedding seed.
 - Documentary archive: LP-MAP 1.0 collection hierarchy, item, representation, file, AV track, transcript, rights, PREMIS-style event, fixity, accession, and custody structures are implemented. The root archival control record is `LP-ARCHIVE-001`.
@@ -22,7 +22,7 @@
 - Repository assurance: locked Node 24 build, dependency audit, archive tooling tests, local-link and migration validation, pinned GitHub Actions, Dependabot, and a preservation-aware pull-request checklist.
 - Preservation assessment: `LP-ASSESS-2026-0001` now records partial operating evidence under NDSA Levels 2.1: one real payload has completed managed ingest, an independent online replica, fixity verification, and a clean restore. No overall maturity level is claimed because an offline or logically isolated third copy, representative audiovisual pilots, interactive identity recovery, and release acceptance remain outstanding.
 
-The remaining security-advisor warning is Supabase Auth leaked-password protection. It is a plan/dashboard setting and should be enabled before password-based user onboarding if the project plan supports it. New-database unused-index notices are expected until representative workloads exercise the indexes. The Auth connection-allocation notice matters only when scaling compute.
+The remaining security-advisor warning is Supabase Auth leaked-password protection. It is a plan/dashboard setting and should be enabled before password-based user onboarding if the project plan supports it. New-database unused-index notices are expected until representative workloads exercise the indexes. The Auth connection-allocation notice matters only when scaling compute. The public MCP control and acceptance specification is `LP-DOC-ARCH-025`.
 
 ## Vercel
 

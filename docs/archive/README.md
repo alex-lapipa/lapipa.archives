@@ -37,6 +37,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 22. [LP-DOC-ARCH-022 — Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md)
 23. [LP-DOC-ARCH-023 — Pilot malware and format validation — 7 August 2026](pilot-malware-and-format-validation-2026-08-07.md)
 24. [LP-DOC-ARCH-024 — Backblaze preservation ingest and restore evidence — 7 August 2026](backblaze-pilot-ingest-and-restore-2026-08-07.md)
+25. [LP-DOC-ARCH-025 — Public MCP access and abuse controls — 7 August 2026](public-mcp-access-and-abuse-controls.md)
 
 ## Standards profile
 
@@ -64,6 +65,7 @@ The implementation is an application profile, not a claim of formal certificatio
 - Public access is an affirmative decision, not a default.
 - Automated transcripts, OCR, entity extraction, and summaries are labeled as automated until reviewed.
 - Voyage embeddings are discovery aids. They are reproducible derivatives, not archival masters.
+- Anonymous MCP access is limited to affirmatively public records, enforced in PostgreSQL and tested at the deployed boundary.
 - Notion supports editorial review; GitHub controls policies and implementation; Supabase controls structured records and managed objects; Vercel provides the access surface.
 
 ## Current maturity boundary
