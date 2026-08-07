@@ -4,7 +4,7 @@ Evidence date: 8 August 2026
 
 Owner: Alex Lawton
 
-Status: local package validated; production preservation upload pending
+Status: live archive upload, complete restore, and Supabase registration verified
 
 ## Scope
 
@@ -73,16 +73,13 @@ This is a preliminary characterization. Full MediaInfo or FFmpeg/FFprobe stream 
 - Tag manifest SHA-256: `0fa7fed16b692a9d5de664f1b960eb19a0ef5b5df8e54f81aaf87d764fb532c6`
 - Accession inventory SHA-256: `21123885078437634db38fdc70463d51b7531a43e7da7054709d18887584ecd7`
 
-The package is staged on `G-DRIVE 02` in the dedicated La Pipa archive area. It has not yet been uploaded to production Backblaze storage or registered as an accepted Supabase accession.
+The package remains staged on `G-DRIVE 02` and is now also stored in private, AES-256 encrypted Backblaze B2 bucket `miramonte-lapipa-archive`. All eight stored objects were downloaded into a clean restore tree, matched their expected SHA-256 digests, and were registered under `LP-ACC-2026-0003` in Supabase. Object Lock and default retention are disabled. The existing Backblaze pilot remains untouched.
 
 ## Next gate
 
-1. confirm the production Backblaze bucket and Object Lock decision;
-2. establish a bucket-scoped replication identity without delete authority;
-3. upload the BagIt package resumably;
-4. read back object metadata and version IDs;
-5. compare remote and expected SHA-256 values;
-6. perform a clean restore and revalidate the BagIt package;
-7. register accession, package files, canonical file objects, copies, fixity checks, QC outcomes, and preservation events in Supabase;
-8. publish the tested evidence to Notion;
-9. produce a separate owner-review disposition report before any duplicate source occurrence can be removed.
+The verified descriptive record is now indexed as four `voyage-context-4` contextual embeddings. A live semantic query ranked the correct storage-and-retention passage first. Three new graph entities and four source-linked relationships connect the item, Backblaze B2, the bucket, and La Pipa Archives.
+
+1. complete speech transcription and deeper audiovisual description for the two videos;
+2. publish the tested evidence to Notion;
+3. continue with the next bounded live-archive folder;
+4. produce a separate owner-review disposition report before any duplicate source occurrence can be removed.
