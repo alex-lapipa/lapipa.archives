@@ -35,6 +35,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 20. [Website and media accession — 5 August 2026](website-accession-2026-08-05.md)
 21. [Rights ownership declaration](rights-ownership-declaration.md)
 22. [LP-DOC-ARCH-022 — Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md)
+23. [LP-DOC-ARCH-023 — Pilot malware and format validation — 7 August 2026](pilot-malware-and-format-validation-2026-08-07.md)
 
 ## Standards profile
 
