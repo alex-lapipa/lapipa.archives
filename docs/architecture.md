@@ -16,6 +16,8 @@ Embeddings are separated from canonical chunks. The unique combination of chunk,
 
 Canonical schemas are not exposed through the Data API. Only deliberately designed functions live in `public`. Authenticated users must also appear in `kb.workspace_members` as `owner`, `editor`, `reviewer`, or `reader`. Anonymous access to data and Storage is denied.
 
+`pipa-mcp` is a separate, deliberately anonymous read-only access surface for the affirmatively public corpus. Its database functions are `SECURITY INVOKER`, executable only by the Edge Function server role, and repeat public-scope checks across documents, chunks, sources, entities, relationship objects, events, locations, and participants. Client inputs cannot widen scope. Database-atomic limits, a daily Voyage budget, a short-lived hash-keyed cache, bounded inputs, and privacy-preserving audit records protect the public interface from accidental disclosure and uncontrolled semantic-search cost. See [LP-DOC-ARCH-025](archive/public-mcp-access-and-abuse-controls.md).
+
 The first owner must be added by an authorized database administrator after that user has authenticated. The migration intentionally does not guess a user ID or authorize by email/user metadata.
 
 ## Storage
