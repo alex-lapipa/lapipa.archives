@@ -797,7 +797,7 @@ begin
     'LP-EMBED-PUBLIC-MCP-CONTROLS-2026-08-07',
     'voyage_contextual_embedding',
     'queued',
-    '827fa26f-df7f-4d24-9521-0e44bcf37696',
+    (select id from auth.users where id = '827fa26f-df7f-4d24-9521-0e44bcf37696' limit 1),
     jsonb_build_object(
       'document_id', 'lp-public-mcp-access-controls-2026-08-07-v1',
       'chunk_ids', array['LP-RAG-025','LP-RAG-026','LP-RAG-027','LP-RAG-028'],
