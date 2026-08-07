@@ -36,6 +36,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 21. [Rights ownership declaration](rights-ownership-declaration.md)
 22. [LP-DOC-ARCH-022 — Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md)
 23. [LP-DOC-ARCH-023 — Pilot malware and format validation — 7 August 2026](pilot-malware-and-format-validation-2026-08-07.md)
+24. [LP-DOC-ARCH-024 — Backblaze preservation ingest and restore evidence — 7 August 2026](backblaze-pilot-ingest-and-restore-2026-08-07.md)
 
 ## Standards profile
 
@@ -67,7 +68,7 @@ The implementation is an application profile, not a claim of formal certificatio
 
 ## Current maturity boundary
 
-The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, an assigned human owner, and a tested connection to a separately provided Backblaze B2 preservation location. It does not yet claim a verified independent preservation copy, trustworthy digital repository certification, full geographic redundancy, preservation-format normalization for all media, or public availability. Those outcomes require copied and fixity-verified objects, tested recovery, an isolated third copy, a backup administrator, and continuing review.
+The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, an assigned human owner, and one tested independent online Backblaze B2 preservation copy. The first BagIt pilot has completed upload, five object-level SHA-256 checks, and a clean restore. The platform does not yet claim trustworthy digital repository certification, full three-copy redundancy, an isolated third copy, preservation-format normalization for all media, or public availability. Those outcomes require continuing fixity evidence, representative audiovisual processing, a backup administrator, and release review.
 
 ## Authoritative references
 

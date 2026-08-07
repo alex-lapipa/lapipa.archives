@@ -2,9 +2,9 @@
 
 ## Current truth — 7 August 2026
 
-Supabase in `eu-west-1` is the configured operational object store. Backblaze B2 in `eu-central-003` is now a separately provided, private, encrypted, S3-compatible location whose credential pair, exact bucket, endpoint, privacy mode, encryption metadata, and Object Lock metadata have passed a read-only connection test.
+Supabase in `eu-west-1` is the configured operational object store. Backblaze B2 in `eu-central-003` is a separately provided, private, encrypted, S3-compatible location whose credential pair, exact bucket, endpoint, privacy mode, encryption metadata, and Object Lock metadata passed a read-only connection test. On 7 August 2026, the full five-object `LP-BAG-2026-0001` pilot was also uploaded, versioned, fixity-checked, downloaded into a clean restore tree, and BagIt-validated.
 
-No archive object has yet been copied to Backblaze, fixity-verified there, or restored from it. The B2 location therefore does not yet count as a verified independent preservation copy. Object Lock is disabled and the current broad application key includes delete authority; those controls must be addressed before routine replication.
+Backblaze now counts as the first tested independent online preservation location for the pilot scope. Five objects totaling 194,032,057 bytes have verified copy records with distinct version IDs, matching expected and observed SHA-256 digests, and observed AES-256 server-side encryption. Object Lock is disabled and the current broad application key includes delete authority; those controls must still be addressed before routine unattended replication.
 
 ## Target topology
 
@@ -49,6 +49,6 @@ The current Backblaze credential is stored only in Supabase Edge Function secret
 
 ## Approved pilot and pending preservation decisions
 
-The archive owner approved proceeding with Backblaze B2 as the initial independent-storage pilot. The sanitized verification record is [Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md).
+The archive owner approved proceeding with Backblaze B2 as the initial independent-storage pilot. The sanitized configuration record is [Backblaze preservation-storage verification — 7 August 2026](backblaze-preservation-verification-2026-08-07.md), and the completed object and restore evidence is [LP-DOC-ARCH-024](backblaze-pilot-ingest-and-restore-2026-08-07.md).
 
-Before production replication, the owner must still approve the final bucket, versioning and Object Lock design, retention period, annual cost ceiling, recovery owner, and break-glass process. The routine replication and verification keys should be bucket-scoped and should not have delete authority. The pilot must complete upload, fixity, restore, and evidence-recording gates before it is counted toward the three-copy target.
+Before production replication, the owner must still approve the final bucket, Object Lock design, retention period, annual cost ceiling, recovery owner, and break-glass process. The routine replication and verification keys should be bucket-scoped and should not have delete authority. The completed Backblaze pilot counts as one independent online copy toward the three-copy target; an offline or logically isolated third copy remains required.
