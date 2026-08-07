@@ -2,6 +2,7 @@
 
 - Record ID: `LP-EVENT-B2-CONNECTION-2026-08-07-001`
 - Storage location: `LP-LOC-B2-EUC3-001`
+- Document ID: `LP-DOC-ARCH-022`
 - Outcome: connection and bucket-control validation passed; preservation-copy acceptance remains pending
 
 ## Purpose
