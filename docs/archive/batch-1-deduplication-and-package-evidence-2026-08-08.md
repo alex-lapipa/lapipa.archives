@@ -1,7 +1,9 @@
 # LP-DOC-ARCH-028 — Batch 1 deduplication and package evidence
 
-Evidence date: 8 August 2026  
-Owner: Alex Lawton  
+Evidence date: 8 August 2026
+
+Owner: Alex Lawton
+
 Status: local package validated; production preservation upload pending
 
 ## Scope

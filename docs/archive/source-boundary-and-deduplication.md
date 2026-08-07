@@ -1,8 +1,11 @@
 # Source boundary and deduplication control
 
-Document ID: LP-DOC-ARCH-027  
-Effective date: 8 August 2026  
-Owner: Alex Lawton  
+Document ID: LP-DOC-ARCH-027
+
+Effective date: 8 August 2026
+
+Owner: Alex Lawton
+
 Status: controlled draft
 
 ## Purpose
