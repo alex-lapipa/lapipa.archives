@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import {
   ACCEPTANCE_ACCESSION_ID,
@@ -15,6 +17,7 @@ import {
 
 const code = "LP-ABCD-EFGH-JKMN-PQRS-TUVW";
 const runnerToken = "a".repeat(64);
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function providerPayload(byteCount = 4) {
   return {
@@ -35,6 +38,22 @@ function providerPayload(byteCount = 4) {
     },
   };
 }
+
+test("Mac launcher resolves the runner from its own directory", {
+  skip: process.platform !== "darwin",
+}, () => {
+  const launcherPath = path.join(projectRoot, "Run La Pipa One Video Acceptance.command");
+  const result = spawnSync(launcherPath, {
+    cwd: tmpdir(),
+    encoding: "utf8",
+    env: { ...process.env, TERM: "dumb" },
+    input: "\n\n",
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /No authorization code was received\. Nothing was changed\./);
+  assert.doesNotMatch(result.stderr, /Cannot find module/);
+});
 
 test("acceptance code normalization is strict and separator-tolerant", () => {
   assert.equal(normalizeAcceptanceCode(code.toLowerCase()), "LPABCDEFGHJKMNPQRSTUVW");
