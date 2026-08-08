@@ -40,6 +40,7 @@ Archive package tools:
 
 ```sh
 npm run archive:inventory -- /path/to/source /path/to/inventory.json
+npm run archive:reconcile -- /path/to/reconciliation.json /path/to/inventory-1.json /path/to/inventory-2.json
 npm run archive:create-bag -- /path/to/source /path/to/LP-ACC-2026-0001
 npm run archive:validate-bag -- /path/to/LP-ACC-2026-0001
 npm run archive:validate-website -- data/accessions/LP-WEB-2026-08-05
@@ -56,4 +57,4 @@ Use `.env.example` as the list of required Vercel configuration names. The Verce
 5. Deploy and verify a Vercel preview.
 6. Promote only after authentication, RLS, retrieval, and citation checks pass.
 
-See [docs/architecture.md](docs/architecture.md), [docs/operations.md](docs/operations.md), and the [Documentary Archive handbook](docs/archive/README.md).
+See [docs/architecture.md](docs/architecture.md), [docs/operations.md](docs/operations.md), the [Documentary Archive handbook](docs/archive/README.md), and the [first live archive upload report](docs/archive/live-archive-first-upload-2026-08-08.md).

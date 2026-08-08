@@ -1,6 +1,7 @@
 import { cp, mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { inventoryInput, isWithin, resolveAccessionInput, sha256File, sha256Text } from "./lib.mjs";
+import { assertArchivePathAllowed, loadArchiveScopePolicy } from "./scope-policy.mjs";
 
 const [inputArg, bagArg] = process.argv.slice(2);
 if (!inputArg || !bagArg) {
@@ -9,6 +10,7 @@ if (!inputArg || !bagArg) {
 }
 
 const input = await resolveAccessionInput(inputArg);
+const scopePolicy = await loadArchiveScopePolicy();
 const bag = resolve(bagArg);
 if (bag === input.path || (input.input_type === "directory" && isWithin(input.path, bag)) || isWithin(bag, input.path)) {
   throw new Error("bag and accession input must be separate locations");
@@ -18,7 +20,9 @@ try { await stat(bag); throw new Error("bag output already exists; existing pack
 const temporary = resolve(dirname(bag), `.${basename(bag)}.building-${process.pid}`);
 try {
   await mkdir(resolve(temporary, "data"), { recursive: true });
-  const records = await inventoryInput(input);
+  const records = await inventoryInput(input, {
+    assertPathAllowed: (path) => assertArchivePathAllowed(path, scopePolicy),
+  });
   for (const record of records) {
     const source = resolve(input.root, record.path);
     const target = resolve(temporary, "data", record.path);
@@ -33,6 +37,7 @@ try {
     `Bagging-Date: ${new Date().toISOString().slice(0, 10)}`,
     `Payload-Oxum: ${records.reduce((sum, record) => sum + record.byte_count, 0)}.${records.length}`,
     "Bag-Software-Agent: lapipa-archives create-bag/1.0",
+    `Source-Scope-Policy: ${scopePolicy.policy_id}`,
   ].join("\n") + "\n";
   await writeFile(resolve(temporary, "bagit.txt"), bagit, "utf8");
   await writeFile(resolve(temporary, "bag-info.txt"), bagInfo, "utf8");
