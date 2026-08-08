@@ -1,4 +1,4 @@
-# Implementation status — 7 August 2026
+# Implementation status — 8 August 2026
 
 ## Supabase
 
@@ -7,6 +7,7 @@
 - Reviewed seed: 35 sources, 9 claims, 14 entities, 9 events, 11 relationships, 19 chunks, and 8 evaluation questions.
 - Voyage: 355 active content-hash-matching contextual embeddings using `voyage-context-4` at 1,024 dimensions: 19 reviewed foundation chunks, 327 website/media chunks, one rights-declaration chunk, four preservation-ingest evidence chunks, and four public-MCP control chunks. Job `LP-EMBED-PUBLIC-MCP-CONTROLS-2026-08-07` succeeded with four embedded and zero pending; its short-lived random-name Edge Function was deleted immediately and the four temporary service-role RPCs are removed by the finalization migration. Clean previews and restores retain a truthful queued regeneration state and never issue a paid Voyage request during schema replay.
 - Website accession `LP-ACC-2026-0002` is live and reconciled: 52 current pages, 55 legacy export records, 117 external-media records, 26 captured YouTube transcripts, 224 archive items, and 327 deterministic chunks. All 327 chunks have content-hash-matching `voyage-context-4` embeddings at 1,024 dimensions; zero are missing or stale. The tightly bounded one-time trigger was deleted immediately after success, and the accession-specific service-role RPCs are removed by the finalization migration.
+- Vimeo accession `LP-ACC-2026-0005` has completed its owner-authorized local acceptance stage for `Subterranea @ LA PIPA :: VIUDA` (Vimeo `844151157`). The 328,003,637-byte ProRes/PCM preservation master has local SHA-256 `b15ea951246acdd46561f13f87be7fc2de0b2ba35ac7dc79a4f437b7617e09aa`; MLX Whisper produced ten timed Spanish segments marked machine-generated and unreviewed. Backblaze upload, clean restore verification, Supabase registration, and Voyage embedding are not yet claimed for this accession.
 - Storage: `source-originals`, `source-derivatives`, `knowledge-exports`, `preservation-masters`, and `access-media`; all private.
 - Provenance validation: zero chunks without sources and zero claims without sources.
 - Controlled preservation RAG: `LP-SRC-039`, document `lp-backblaze-pilot-ingest-restore-2026-08-07-v1`, and chunks `LP-RAG-021` through `LP-RAG-024` are live, source-linked, restricted, and embedded. Job `LP-EMBED-PRESERVATION-2026-08-07` succeeded with four embedded and zero pending; its disposable Edge Function and service-role RPC surface were removed.

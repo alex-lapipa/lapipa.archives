@@ -1,6 +1,6 @@
 # LP-DOC-ARCH-029 — Vimeo one-video acceptance
 
-Status: implementation ready for branch review; no live Vimeo download has been claimed.
+Status: local Vimeo acceptance completed and fixity-verified; Backblaze ingest not yet claimed.
 Owner: Alex Lawton
 Exact source: Vimeo `844151157`, *Subterranea @ LA PIPA :: VIUDA*
 Accession: `LP-ACC-2026-0005`
@@ -10,6 +10,23 @@ Accession: `LP-ACC-2026-0005`
 This stage proves the smallest controlled transfer before any multi-video processing. It downloads exactly one 46-second, La Pipa-branded video directly from Vimeo to the external archive staging drive. It does not upload to Backblaze, transcribe media, write archive records, request Voyage embeddings, or delete any source.
 
 The selected item is intentionally not one of the ReMotive-labelled entries shown by the planning dry run. Vumi and unrelated client work remain categorically outside the archive scope.
+
+## Acceptance outcome — 8 August 2026
+
+Alex completed the owner-authorized terminal run. Vimeo delivered the source-quality preservation master directly to `G-DRIVE 02`; no source was deleted and no capability or signed provider URL was retained.
+
+| Control | Verified result |
+|---|---|
+| Media file | `vimeo-844151157-source.mp4` |
+| Byte count | 328,003,637 |
+| SHA-256 | `b15ea951246acdd46561f13f87be7fc2de0b2ba35ac7dc79a4f437b7617e09aa` |
+| Duration | 46.52 seconds |
+| Video | Apple ProRes, 1024 × 768, 25 fps |
+| Audio | 24-bit little-endian PCM, stereo, 48 kHz |
+| Local transcript | MLX Whisper 0.4.3, `whisper-large-v3-turbo`, Spanish, 10 timed provisional segments |
+| Transcript review | Machine-generated and unreviewed; not approved as a verified quotation |
+
+The transcript discusses the music scene beyond Madrid and Barcelona, the value of sustaining an Asturian scene for future generations, and local music-community support. This summary describes machine output and remains subject to human review.
 
 ## Authorization design
 
@@ -52,6 +69,6 @@ The manifest records the provider metadata, byte count, SHA-256 fixity, optional
 - no source deletion, Backblaze upload, transcription, database registration, or embedding occurs;
 - no capability or signed provider URL is retained.
 
-## Next reviewed stage
+## Next controlled stage
 
-After Alex inspects the downloaded video and manifest, the next change may add: local transcription, exact-object Backblaze preservation upload, restore/fixity verification, Supabase registration, and Voyage embedding for this same accession. Batch size remains one until that full path passes and its evidence is reviewed.
+The follow-on implementation adds exact-object Backblaze upload and complete clean restore verification under a new owner-issued code. Permanent Backblaze credentials remain only in Supabase secrets. The transfer permits no delete operation, accepts only the eleven declared paths under `lapipa/vimeo/LP-ACC-2026-0005`, refuses to overwrite a differing object, and retains source deletion as false. Supabase catalogue registration and Voyage embedding occur only after the restore evidence exists. Batch size remains one until that full path passes and its evidence is reviewed.
