@@ -2,9 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import {
   isOwnerRole,
   normalizeArchiveResults,
-  normalizeVimeoRunnerAuthorization,
+  normalizeVimeoBatch2Authorization,
   ownerRedirectUrl,
-  VIMEO_ACCEPTANCE_VIDEO_ID,
+  VIMEO_BATCH2_PROFILES,
 } from "./archive-client.mjs";
 
 const byId = (id) => document.getElementById(id);
@@ -24,6 +24,7 @@ const searchSubmit = byId("archive-search-submit");
 const searchMessage = byId("archive-search-message");
 const searchResults = byId("archive-search-results");
 const runnerCreateButton = byId("vimeo-runner-create");
+const runnerVideoSelect = byId("vimeo-runner-video");
 const runnerCodePanel = byId("vimeo-runner-code-panel");
 const runnerCode = byId("vimeo-runner-code");
 const runnerCopyButton = byId("vimeo-runner-copy");
@@ -32,6 +33,13 @@ const runnerMessage = byId("vimeo-runner-message");
 let archiveClient;
 let archiveConfig;
 let runnerExpiryTimer;
+
+for (const profile of VIMEO_BATCH2_PROFILES) {
+  const option = document.createElement("option");
+  option.value = profile.video_id;
+  option.textContent = `${profile.accession_id} · ${profile.title}`;
+  runnerVideoSelect.append(option);
+}
 
 function setMessage(node, text, state = "neutral") {
   node.textContent = text;
@@ -71,9 +79,10 @@ async function createVimeoRunnerAuthorization() {
 
   runnerCreateButton.disabled = true;
   clearRunnerAuthorization();
-  setMessage(runnerMessage, "Creating a one-time code for the single approved Vimeo preservation accession…");
+  const requestedVideoId = runnerVideoSelect.value;
+  setMessage(runnerMessage, "Creating a one-time code for the selected reviewed Vimeo accession…");
   try {
-    const response = await fetch(`${archiveConfig.supabaseUrl}/functions/v1/vimeo-archive-session`, {
+    const response = await fetch(`${archiveConfig.supabaseUrl}/functions/v1/vimeo-batch2-session`, {
       method: "POST",
       cache: "no-store",
       headers: {
@@ -81,11 +90,11 @@ async function createVimeoRunnerAuthorization() {
         apikey: archiveConfig.supabasePublishableKey,
         authorization: `Bearer ${sessionData.session.access_token}`,
       },
-      body: JSON.stringify({ action: "create", video_id: VIMEO_ACCEPTANCE_VIDEO_ID }),
+      body: JSON.stringify({ action: "create", video_id: requestedVideoId }),
     });
     const payload = await response.json().catch(() => null);
     if (!response.ok) throw new Error(payload?.error || "authorization_failed");
-    const authorization = normalizeVimeoRunnerAuthorization(payload);
+    const authorization = normalizeVimeoBatch2Authorization(payload, requestedVideoId);
     runnerCode.textContent = authorization.code;
     runnerCodePanel.hidden = false;
     runnerExpiryTimer = window.setTimeout(() => {
@@ -93,9 +102,9 @@ async function createVimeoRunnerAuthorization() {
       setMessage(runnerMessage, "That code has expired and was removed from this page. Generate a fresh code when you are ready.", "error");
     }, Math.max(authorization.expiresAt.getTime() - Date.now(), 1));
     const expiry = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(authorization.expiresAt);
-    setMessage(runnerMessage, `Authorized only for accession LP-ACC-2026-0005 and Vimeo ${authorization.videoId}. Paste this code into the preservation ingest Mac launcher before ${expiry}.`, "success");
+    setMessage(runnerMessage, `Authorized only for ${authorization.accessionId} and Vimeo ${authorization.videoId}. Paste this code into the Batch 2 Mac launcher before ${expiry}.`, "success");
   } catch {
-    setMessage(runnerMessage, "The one-video code could not be created. No preservation action was authorized; refresh your owner session and try again.", "error");
+    setMessage(runnerMessage, "The Batch 2 code could not be created. No preservation action was authorized; refresh your owner session and try again.", "error");
   } finally {
     runnerCreateButton.disabled = false;
   }
@@ -245,6 +254,7 @@ async function initializeOwnerAccess() {
     searchForm.addEventListener("submit", runArchiveSearch);
     runnerCreateButton.addEventListener("click", createVimeoRunnerAuthorization);
     runnerCopyButton.addEventListener("click", copyVimeoRunnerAuthorization);
+    runnerVideoSelect.addEventListener("change", clearRunnerAuthorization);
     signOutButton.addEventListener("click", async () => {
       signOutButton.disabled = true;
       await archiveClient.auth.signOut({ scope: "local" });
