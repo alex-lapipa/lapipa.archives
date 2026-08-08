@@ -59,7 +59,7 @@ function clearRunnerAuthorization() {
   if (runnerCode) runnerCode.textContent = "";
   if (runnerCodePanel) runnerCodePanel.hidden = true;
   if (runnerCopyButton) runnerCopyButton.textContent = "Copy code";
-  if (runnerMessage) setMessage(runnerMessage, "Nothing is authorized until you generate a code. Codes expire after 10 minutes and work once.");
+  if (runnerMessage) setMessage(runnerMessage, "Nothing is authorized until you generate a code. Codes expire after 10 minutes and can be exchanged once.");
 }
 
 async function createVimeoRunnerAuthorization() {
@@ -71,7 +71,7 @@ async function createVimeoRunnerAuthorization() {
 
   runnerCreateButton.disabled = true;
   clearRunnerAuthorization();
-  setMessage(runnerMessage, "Creating a one-time code for the single approved Vimeo test…");
+  setMessage(runnerMessage, "Creating a one-time code for the single approved Vimeo preservation accession…");
   try {
     const response = await fetch(`${archiveConfig.supabaseUrl}/functions/v1/vimeo-archive-session`, {
       method: "POST",
@@ -93,9 +93,9 @@ async function createVimeoRunnerAuthorization() {
       setMessage(runnerMessage, "That code has expired and was removed from this page. Generate a fresh code when you are ready.", "error");
     }, Math.max(authorization.expiresAt.getTime() - Date.now(), 1));
     const expiry = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(authorization.expiresAt);
-    setMessage(runnerMessage, `Authorized only for Vimeo ${authorization.videoId}. Paste this code into the Mac launcher before ${expiry}.`, "success");
+    setMessage(runnerMessage, `Authorized only for accession LP-ACC-2026-0005 and Vimeo ${authorization.videoId}. Paste this code into the preservation ingest Mac launcher before ${expiry}.`, "success");
   } catch {
-    setMessage(runnerMessage, "The one-video code could not be created. No download was authorized; refresh your owner session and try again.", "error");
+    setMessage(runnerMessage, "The one-video code could not be created. No preservation action was authorized; refresh your owner session and try again.", "error");
   } finally {
     runnerCreateButton.disabled = false;
   }
