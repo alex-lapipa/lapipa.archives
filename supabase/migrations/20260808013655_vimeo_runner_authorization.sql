@@ -30,13 +30,6 @@ create index vimeo_runner_sessions_requested_by_created_idx
 
 alter table ops.vimeo_runner_sessions enable row level security;
 revoke all on table ops.vimeo_runner_sessions from public, anon, authenticated;
-create policy vimeo_runner_sessions_deny_direct_access
-  on ops.vimeo_runner_sessions
-  as restrictive
-  for all
-  to anon, authenticated
-  using (false)
-  with check (false);
 
 create or replace function private.create_vimeo_runner_session_internal(
   requested_video_id text,
