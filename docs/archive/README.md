@@ -41,6 +41,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 26. [LP-DOC-ARCH-027 — Source boundary and deduplication control — 8 August 2026](source-boundary-and-deduplication.md)
 27. [LP-DOC-ARCH-028 — Batch 1 deduplication and package evidence — 8 August 2026](batch-1-deduplication-and-package-evidence-2026-08-08.md)
 28. [Vimeo terminal runner — safe planning release](vimeo-terminal-runner.md)
+29. [LP-DOC-ARCH-029 — Vimeo one-video acceptance](vimeo-one-video-acceptance.md)
 
 ## Standards profile
 

@@ -41,7 +41,7 @@ The command only prints a proposed batch. It does not write a state file, contac
 
 ## Acceptance gates before enabling live mode
 
-1. Add an owner-authorized, exact-video Vimeo control endpoint that retains the Vimeo access token in Supabase.
+1. Deploy and interactively verify the implemented owner-authorized, exact-video Vimeo control endpoint, which retains the Vimeo access token in Supabase. See [LP-DOC-ARCH-029](vimeo-one-video-acceptance.md).
 2. Add an owner-authorized, exact-object Backblaze signing endpoint that retains Backblaze credentials in Supabase.
 3. Add resumable local transfer state with atomic checkpoints.
 4. Reconcile remote size and SHA-256 evidence before recording a copy as verified.

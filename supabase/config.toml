@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.pipa-mcp]
 verify_jwt = false
+
+[functions.vimeo-archive-session]
+verify_jwt = false

@@ -1,5 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
-import { isOwnerRole, normalizeArchiveResults, ownerRedirectUrl } from "./archive-client.mjs";
+import {
+  isOwnerRole,
+  normalizeArchiveResults,
+  normalizeVimeoRunnerAuthorization,
+  ownerRedirectUrl,
+  VIMEO_ACCEPTANCE_VIDEO_ID,
+} from "./archive-client.mjs";
 
 const byId = (id) => document.getElementById(id);
 const accessPanel = byId("access-panel");
@@ -17,8 +23,15 @@ const searchInput = byId("archive-search-query");
 const searchSubmit = byId("archive-search-submit");
 const searchMessage = byId("archive-search-message");
 const searchResults = byId("archive-search-results");
+const runnerCreateButton = byId("vimeo-runner-create");
+const runnerCodePanel = byId("vimeo-runner-code-panel");
+const runnerCode = byId("vimeo-runner-code");
+const runnerCopyButton = byId("vimeo-runner-copy");
+const runnerMessage = byId("vimeo-runner-message");
 
 let archiveClient;
+let archiveConfig;
+let runnerExpiryTimer;
 
 function setMessage(node, text, state = "neutral") {
   node.textContent = text;
@@ -28,6 +41,7 @@ function setMessage(node, text, state = "neutral") {
 function showSignedOut(message = "Use either pre-authorized owner email. A one-time sign-in link will be sent to that inbox.") {
   signedOutView.hidden = false;
   signedInView.hidden = true;
+  clearRunnerAuthorization();
   setMessage(authMessage, message);
 }
 
@@ -37,6 +51,66 @@ function showSignedIn(user, role) {
   ownerIdentity.textContent = user.email || "Confirmed owner";
   ownerRole.textContent = role;
   setMessage(searchMessage, "Search the controlled archive. Results retain their document, chunk, source, and verification references.");
+}
+
+function clearRunnerAuthorization() {
+  if (runnerExpiryTimer) window.clearTimeout(runnerExpiryTimer);
+  runnerExpiryTimer = undefined;
+  if (runnerCode) runnerCode.textContent = "";
+  if (runnerCodePanel) runnerCodePanel.hidden = true;
+  if (runnerCopyButton) runnerCopyButton.textContent = "Copy code";
+  if (runnerMessage) setMessage(runnerMessage, "Nothing is authorized until you generate a code. Codes expire after 10 minutes and work once.");
+}
+
+async function createVimeoRunnerAuthorization() {
+  const { data: sessionData } = await archiveClient.auth.getSession();
+  if (!sessionData.session) {
+    showSignedOut("Your session has ended. Request a fresh one-time link.");
+    return;
+  }
+
+  runnerCreateButton.disabled = true;
+  clearRunnerAuthorization();
+  setMessage(runnerMessage, "Creating a one-time code for the single approved Vimeo test…");
+  try {
+    const response = await fetch(`${archiveConfig.supabaseUrl}/functions/v1/vimeo-archive-session`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "content-type": "application/json",
+        apikey: archiveConfig.supabasePublishableKey,
+        authorization: `Bearer ${sessionData.session.access_token}`,
+      },
+      body: JSON.stringify({ action: "create", video_id: VIMEO_ACCEPTANCE_VIDEO_ID }),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(payload?.error || "authorization_failed");
+    const authorization = normalizeVimeoRunnerAuthorization(payload);
+    runnerCode.textContent = authorization.code;
+    runnerCodePanel.hidden = false;
+    runnerExpiryTimer = window.setTimeout(() => {
+      clearRunnerAuthorization();
+      setMessage(runnerMessage, "That code has expired and was removed from this page. Generate a fresh code when you are ready.", "error");
+    }, Math.max(authorization.expiresAt.getTime() - Date.now(), 1));
+    const expiry = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(authorization.expiresAt);
+    setMessage(runnerMessage, `Authorized only for Vimeo ${authorization.videoId}. Paste this code into the Mac launcher before ${expiry}.`, "success");
+  } catch {
+    setMessage(runnerMessage, "The one-video code could not be created. No download was authorized; refresh your owner session and try again.", "error");
+  } finally {
+    runnerCreateButton.disabled = false;
+  }
+}
+
+async function copyVimeoRunnerAuthorization() {
+  const code = runnerCode.textContent.trim();
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    runnerCopyButton.textContent = "Copied";
+    window.setTimeout(() => { runnerCopyButton.textContent = "Copy code"; }, 1800);
+  } catch {
+    setMessage(runnerMessage, "Select the visible code and copy it manually. It has not been stored by this page.", "error");
+  }
 }
 
 function clearCallbackMarker() {
@@ -157,8 +231,8 @@ async function initializeOwnerAccess() {
   try {
     const response = await fetch("/api/client-config", { cache: "no-store" });
     if (!response.ok) throw new Error("client_configuration_required");
-    const config = await response.json();
-    archiveClient = createClient(config.supabaseUrl, config.supabasePublishableKey, {
+    archiveConfig = await response.json();
+    archiveClient = createClient(archiveConfig.supabaseUrl, archiveConfig.supabasePublishableKey, {
       auth: {
         autoRefreshToken: true,
         detectSessionInUrl: true,
@@ -169,6 +243,8 @@ async function initializeOwnerAccess() {
 
     authForm.addEventListener("submit", requestOwnerLink);
     searchForm.addEventListener("submit", runArchiveSearch);
+    runnerCreateButton.addEventListener("click", createVimeoRunnerAuthorization);
+    runnerCopyButton.addEventListener("click", copyVimeoRunnerAuthorization);
     signOutButton.addEventListener("click", async () => {
       signOutButton.disabled = true;
       await archiveClient.auth.signOut({ scope: "local" });
