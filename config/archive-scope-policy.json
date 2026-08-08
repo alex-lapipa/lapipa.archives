@@ -13,6 +13,16 @@
       "reason": "Unrelated Remotive Media client material; explicitly excluded by the archive owner."
     }
   ],
+  "vimeo_appraisal": {
+    "held_video_ids": [
+      {
+        "video_id": "726116068",
+        "decision": "owner_scope_review_required",
+        "reason": "The item is evidenced only through the captured lapipa.io Work routes and the La Pipa Vimeo account. No La Pipa initiative, event, programme, showcase, or @LA PIPA title evidence has yet been established."
+      }
+    ],
+    "selection_rule": "Held videos remain discoverable in the source inventory but are never selected for preservation ingest until the owner records an explicit scope decision."
+  },
   "controls": {
     "case_sensitive": false,
     "reject_before_hashing": true,
