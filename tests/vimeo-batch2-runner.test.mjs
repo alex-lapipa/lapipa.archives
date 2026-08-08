@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { access, mkdtemp, mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -15,6 +15,7 @@ import {
   completedBatch2Result,
   ensureBatch2Transcript,
   exchangeBatch2Code,
+  findVerifiedBatch2Restore,
   validateBatch2DownloadAuthorization,
   validateBatch2TransferBundle,
   uploadBatch2AndRestore,
@@ -307,6 +308,77 @@ test("multipart uploader resumes listed parts, completes, and restore-verifies e
   assert.equal(result.multipart_part_count, 2);
   assert.equal(result.restored_sha256, sha256);
   await assert.rejects(access(statePath), /ENOENT/);
+});
+
+test("completed clean restore is revalidated and reused without another large download", async () => {
+  const profile = VIMEO_BATCH2_PROFILES[0];
+  const accessionRoot = await mkdtemp(path.join(tmpdir(), "lapipa-batch2-restore-resume-"));
+  const localPath = path.join(accessionRoot, "preservation", "vimeo-727814369-source.mp4");
+  const restoredPath = path.join(
+    accessionRoot,
+    "restore-verification",
+    "20260808T185520Z",
+    "preservation",
+    "vimeo-727814369-source.mp4",
+  );
+  const bytes = Buffer.from("already clean-restored and verified\n");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  await mkdir(path.dirname(localPath), { recursive: true });
+  await mkdir(path.dirname(restoredPath), { recursive: true });
+  await writeFile(localPath, bytes);
+  await writeFile(restoredPath, bytes);
+
+  const object = {
+    local_path: localPath,
+    relative_path: "preservation/vimeo-727814369-source.mp4",
+    object_path: `${batch2RemotePrefix(profile)}/preservation/vimeo-727814369-source.mp4`,
+    byte_count: bytes.length,
+    sha256,
+    content_type: "video/mp4",
+    upload_method: "s3_multipart",
+    part_size_bytes: 4,
+    part_count: 9,
+    initiate: { url: "https://b2.invalid/initiate", headers: {} },
+    head: { url: "https://b2.invalid/head", headers: {} },
+    restore: { url: "https://b2.invalid/restore", headers: {} },
+  };
+  const session = {
+    sessionId: "LP-VIMEO-RUN-ABCDEF0123456789",
+    runnerToken,
+    profile,
+  };
+  const fetchImpl = async (url) => {
+    const label = new URL(url).pathname.slice(1);
+    if (label === "head") {
+      return new Response(null, {
+        status: 200,
+        headers: {
+          "content-length": String(bytes.length),
+          "x-amz-meta-sha256": sha256,
+          "x-amz-version-id": "verified-version",
+          etag: '"verified-etag"',
+          "x-amz-server-side-encryption": "AES256",
+        },
+      });
+    }
+    throw new Error(`another remote operation is forbidden during verified-restore reuse: ${label}`);
+  };
+
+  const canonicalRestoredPath = await realpath(restoredPath);
+  const discovered = await findVerifiedBatch2Restore(accessionRoot, object);
+  assert.equal(discovered, canonicalRestoredPath);
+  const [result] = await uploadBatch2AndRestore(
+    { objects: [object] },
+    session,
+    path.join(accessionRoot, "restore-verification", "new-run"),
+    { fetchImpl },
+  );
+  assert.equal(result.reused_existing_remote_object, true);
+  assert.equal(result.reused_existing_clean_restore, true);
+  assert.equal(result.restored_path, canonicalRestoredPath);
+  assert.equal(result.restored_sha256, sha256);
+  assert.equal(result.version_id, "verified-version");
+  assert.equal(result.multipart_part_count, 9);
 });
 
 test("completed accession evidence prevents another transfer run", async () => {

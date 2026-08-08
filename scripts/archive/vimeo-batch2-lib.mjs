@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { createReadStream, createWriteStream } from "node:fs";
-import { access, lstat, mkdir, readFile, readdir, rename, stat, statfs, unlink, writeFile } from "node:fs/promises";
+import { access, lstat, mkdir, readFile, readdir, realpath, rename, stat, statfs, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -713,6 +713,65 @@ async function remoteHead(request, object, fetchImpl) {
   return response;
 }
 
+export async function findVerifiedBatch2Restore(accessionRoot, object, options = {}) {
+  const restoreBase = path.resolve(accessionRoot, "restore-verification");
+  let canonicalBase;
+  let runs;
+  try {
+    canonicalBase = await (options.realpathImpl ?? realpath)(restoreBase);
+    runs = await (options.readdirImpl ?? readdir)(restoreBase, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+
+  const runNames = runs.filter((entry) => entry.isDirectory() && !entry.isSymbolicLink())
+    .map((entry) => entry.name)
+    .sort((left, right) => right.localeCompare(left));
+  const hashFile = options.sha256FileImpl ?? sha256File;
+  for (const runName of runNames) {
+    const runRoot = path.resolve(restoreBase, runName);
+    const candidate = path.resolve(runRoot, ...object.relative_path.split("/"));
+    if (!candidate.startsWith(`${runRoot}${path.sep}`)) {
+      throw new Error("Existing restore candidate escaped its verification run.");
+    }
+    try {
+      const candidateStat = await lstat(candidate);
+      if (!candidateStat.isFile() || candidateStat.isSymbolicLink() || candidateStat.size !== object.byte_count) continue;
+      const canonicalCandidate = await (options.realpathImpl ?? realpath)(candidate);
+      if (!canonicalCandidate.startsWith(`${canonicalBase}${path.sep}`)) {
+        throw new Error("Existing restore candidate escaped the accession restore boundary.");
+      }
+      if (await hashFile(canonicalCandidate) !== object.sha256) continue;
+      return canonicalCandidate;
+    } catch (error) {
+      if (error?.code === "ENOENT") continue;
+      throw error;
+    }
+  }
+  return null;
+}
+
+function restoredObjectResult(object, headResponse, restoredPath, uploadDetails) {
+  return {
+    object_path: object.object_path,
+    relative_path: object.relative_path,
+    byte_count: object.byte_count,
+    expected_sha256: object.sha256,
+    restored_sha256: object.sha256,
+    version_id: headResponse.headers.get("x-amz-version-id"),
+    etag: headResponse.headers.get("etag"),
+    server_side_encryption: headResponse.headers.get("x-amz-server-side-encryption"),
+    reused_existing_remote_object: uploadDetails.reused,
+    reused_existing_clean_restore: true,
+    upload_method: "s3_multipart",
+    multipart_part_count: uploadDetails.part_count,
+    resumed_part_count: uploadDetails.resumed_part_count,
+    restored_path: restoredPath,
+    verified: true,
+  };
+}
+
 async function restoreMultipartObject(object, requests, restoreRoot, fetchImpl, uploadDetails) {
   const headResponse = await remoteHead(requests.head, object, fetchImpl);
   if (!headResponse.ok) throw new Error(`Backblaze multipart verification failed (${headResponse.status}).`);
@@ -765,6 +824,15 @@ async function uploadMultipartAndRestore(initialObject, session, restoreRoot, op
   const fetchImpl = options.fetchImpl ?? fetch;
   const initialHead = await remoteHead(initialObject.head, initialObject, fetchImpl);
   if (initialHead.ok) {
+    const accessionRoot = path.resolve(path.dirname(initialObject.local_path), "..");
+    const existingRestore = await findVerifiedBatch2Restore(accessionRoot, initialObject, options);
+    if (existingRestore) {
+      return restoredObjectResult(initialObject, initialHead, existingRestore, {
+        reused: true,
+        part_count: initialObject.part_count,
+        resumed_part_count: 0,
+      });
+    }
     return await restoreMultipartObject(initialObject, initialObject, restoreRoot, fetchImpl, {
       reused: true, part_count: 0, resumed_part_count: 0,
     });
