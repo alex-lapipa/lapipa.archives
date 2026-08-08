@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isOwnerRole, normalizeArchiveResults, ownerRedirectUrl } from "../site/archive-client.mjs";
+import {
+  isOwnerRole,
+  normalizeArchiveResults,
+  normalizeVimeoRunnerAuthorization,
+  ownerRedirectUrl,
+} from "../site/archive-client.mjs";
 
 test("owner access accepts only the database owner role", () => {
   assert.equal(isOwnerRole("owner"), true);
@@ -27,4 +32,23 @@ test("archive search results retain provenance references and cap rendering", ()
   assert.equal(results.length, 20);
   assert.deepEqual(results[0].sourceIds, ["source-0"]);
   assert.equal(results[0].verification, "verified");
+});
+
+test("owner Vimeo authorization accepts only the exact acceptance video and safe code fields", () => {
+  const safeExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const authorization = normalizeVimeoRunnerAuthorization({
+    video_id: "844151157",
+    title: "Subterranea @ LA PIPA :: VIUDA",
+    authorization_code: "lp-abcd-efgh-jkmn-pqrs-tuvw",
+    code_expires_at: safeExpiry,
+    internal_field: "discarded",
+  });
+  assert.equal(authorization.videoId, "844151157");
+  assert.equal(authorization.code, "LP-ABCD-EFGH-JKMN-PQRS-TUVW");
+  assert.equal("internal_field" in authorization, false);
+  assert.throws(() => normalizeVimeoRunnerAuthorization({
+    video_id: "726116068",
+    authorization_code: "LP-ABCD-EFGH-JKMN-PQRS-TUVW",
+    code_expires_at: safeExpiry,
+  }), /outside the approved video scope/);
 });

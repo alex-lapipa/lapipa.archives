@@ -18,3 +18,25 @@ export function ownerRedirectUrl(locationLike) {
 export function isOwnerRole(role) {
   return role === "owner";
 }
+
+export const VIMEO_ACCEPTANCE_VIDEO_ID = "844151157";
+
+export function normalizeVimeoRunnerAuthorization(payload) {
+  if (!payload || typeof payload !== "object") throw new Error("The authorization response is invalid.");
+  if (payload.video_id !== VIMEO_ACCEPTANCE_VIDEO_ID) throw new Error("The authorization is outside the approved video scope.");
+  const normalizedCode = String(payload.authorization_code ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (!/^LP[A-Z0-9]{20}$/.test(normalizedCode)) throw new Error("The authorization code is invalid.");
+  const groups = normalizedCode.slice(2).match(/.{1,4}/g) ?? [];
+  const expiresAt = new Date(payload.code_expires_at);
+  if (!Number.isFinite(expiresAt.getTime())) throw new Error("The authorization expiry is invalid.");
+  const remainingMs = expiresAt.getTime() - Date.now();
+  if (remainingMs <= 0 || remainingMs > 11 * 60 * 1000) throw new Error("The authorization expiry is outside the safe window.");
+  return {
+    code: `LP-${groups.join("-")}`,
+    expiresAt,
+    videoId: VIMEO_ACCEPTANCE_VIDEO_ID,
+    title: typeof payload.title === "string" && payload.title.trim()
+      ? payload.title.trim()
+      : "Subterranea @ LA PIPA :: VIUDA",
+  };
+}
