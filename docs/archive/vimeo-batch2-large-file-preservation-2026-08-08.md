@@ -1,8 +1,8 @@
 ---
 document_id: LP-DOC-ARCH-033
 title: Vimeo Batch 2 Large-File Preservation Path
-status: in_review
-evidence_class: workspace_verified
+status: final
+evidence_class: live_connector_verified
 reviewed_on: 2026-08-08
 owner: Alex Lawton / Miramonte, S.L.
 ---
@@ -42,16 +42,24 @@ Handled transfer interruption deliberately leaves the incomplete multipart state
 
 Before bulk operation, Backblaze should also carry an `AbortIncompleteMultipartUpload` lifecycle rule with a seven-day threshold. That is a cost-control safety net for the narrow case in which the Mac stops after Backblaze accepts parts but before the runner can complete or resume them; it does not affect completed objects.
 
+## Daily-cap interruption recovery
+
+The first multipart run completed the 9,591,214,398-byte Backblaze object and a full clean restore with matching local SHA-256. A later read request was rejected with Backblaze `AccessDenied` because the account's download-bandwidth or Class B daily cap had been reached. This response is a cost-control state, not evidence that the object is absent or different. The runner must stop; it must never reinterpret this `403` as `404`, upload another version, or bypass the remote-object check.
+
+After the Backblaze daily counter resets, or after the owner explicitly changes the cap, a fresh owner capability resumes the accession. For a completed multipart object, the runner first requires a matching remote HEAD. It then discovers only regular, non-symlink files under the accession's restore-verification boundary, canonicalizes the real path, confirms the exact byte count, and recomputes SHA-256. A matching prior clean restore is reused without another 9.59 GB download. A missing or mismatched local restore retains the full clean-download path. No source or remote deletion is introduced.
+
+Backblaze documents that cap counters reset daily at 00:00 GMT and that cap changes may take up to ten minutes. See [Data Caps and Alerts](https://www.backblaze.com/docs/en/cloud-storage-data-caps-and-alerts) and [Create and Manage Caps and Alerts](https://www.backblaze.com/docs/cloud-storage-create-and-manage-caps-and-alerts).
+
 ## Acceptance gates
 
 Before production deployment:
 
 1. Node syntax, archive tests, Edge tests and type checks, repository validation, production build, and dependency audit must pass.
 2. Migration replay must add only the audited `backblaze_multipart_bundle` session action while retaining the existing five-use session ceiling and fixed Vimeo allowlist.
-3. The 43 Node tests and 18 Edge/security tests must pass, proving deterministic 18-part planning for the observed source, resumption from an accepted part, exact restore SHA-256, held-item exclusion, path confinement, and the 25 GB ceiling.
-4. The pull request must be ready for review, not draft, and must merge before Supabase migration or Edge deployment.
+3. The 44 Node tests and 18 Edge/security tests must pass, proving deterministic 18-part planning for the observed source, resumption from an accepted part, verified clean-restore reuse, exact restore SHA-256, held-item exclusion, path confinement, and the 25 GB ceiling.
+4. Every pull request must be ready for review, not draft, and must merge before its corresponding production release.
 
-After deployment, the first live run remains one accession only. Success requires a complete local master, provisional transcript artifacts, exact Backblaze object set, a new clean restore, and matching SHA-256 evidence. Supabase catalogue registration, Voyage embedding, retrieval acceptance, human transcript review, and any public release remain later controlled stages.
+The live run remains one accession only. Final success requires a complete local master, provisional transcript artifacts, exact Backblaze object set, clean-restore evidence, and matching SHA-256 evidence for every object. Supabase catalogue registration, Voyage embedding, retrieval acceptance, human transcript review, and any public release remain later controlled stages.
 
 ## Standards note
 
