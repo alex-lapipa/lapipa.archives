@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -17,6 +17,9 @@ import {
   exchangeBatch2Code,
   validateBatch2DownloadAuthorization,
   validateBatch2TransferBundle,
+  uploadBatch2AndRestore,
+  VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES,
+  VIMEO_BATCH2_MULTIPART_PART_BYTES,
   VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES,
   VIMEO_BATCH2_PROFILES,
   writeBatch2DownloadManifest,
@@ -91,10 +94,15 @@ test("Vimeo provider response cannot escape the selected Batch 2 accession", () 
   assert.throws(() => validateBatch2DownloadAuthorization(wrong, profile), /outside the reviewed Batch 2 accession/);
 });
 
-test("standard-file guard refuses oversized Vimeo media before checking disk or downloading", async () => {
+test("working-space gate routes a 9.6 GB Vimeo source to the reviewed multipart path", async () => {
   const authorization = validateBatch2DownloadAuthorization(providerPayload(), VIMEO_BATCH2_PROFILES[0]);
-  authorization.download.byte_count = VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES + 1;
-  await assert.rejects(assertBatch2WorkingSpace("/path/that/must/not/be/read", authorization), /exceeds the reviewed Backblaze standard-file path/);
+  authorization.download.byte_count = 9_591_214_398;
+  const result = await assertBatch2WorkingSpace("/reviewed/staging", authorization, {
+    statfsImpl: async () => ({ bavail: 100_000_000_000, bsize: 1 }),
+  });
+  assert.equal(result.upload_method, "s3_multipart");
+  authorization.download.byte_count = VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES + 1;
+  await assert.rejects(assertBatch2WorkingSpace("/path/that/must/not/be/read", authorization), /exceeds the reviewed 25 GB/);
 });
 
 test("download manifest retains fixity and appraisal identity but no signed URL", async () => {
@@ -144,7 +152,7 @@ test("Backblaze bundle validation preserves local paths but rejects another acce
     content_type: "application/json",
   }];
   const signed = (operation) => ({
-    url: `https://s3.eu-central-003.backblazeb2.com/miramonte-lapipa-archive/${local[0].object_path}?operation=${operation}`,
+    url: `https://s3.eu-central-003.backblazeb2.com/miramonte-lapipa-archive/${local[0].object_path}?operation=${operation}&X-Amz-Expires=7200&X-Amz-Signature=${"a".repeat(64)}`,
     headers: { "x-amz-content-sha256": "UNSIGNED-PAYLOAD" },
   });
   const payload = {
@@ -153,11 +161,152 @@ test("Backblaze bundle validation preserves local paths but rejects another acce
     video_id: profile.video_id,
     bucket: "miramonte-lapipa-archive",
     prefix: batch2RemotePrefix(profile),
-    objects: [{ ...authorizationInventory(local)[0], upload: signed("put"), head: signed("head"), restore: signed("get") }],
+    objects: [{
+      ...authorizationInventory(local)[0],
+      upload_method: "s3_put",
+      upload: signed("put"),
+      head: signed("head"),
+      restore: signed("get"),
+    }],
   };
   const bundle = validateBatch2TransferBundle(payload, profile, local);
   assert.equal(bundle.objects[0].local_path, local[0].local_path);
   assert.throws(() => validateBatch2TransferBundle({ ...payload, accession_id: "LP-ACC-2026-0007" }, profile, local), /outside the reviewed Batch 2 accession/);
+});
+
+test("Backblaze bundle validation accepts only the deterministic 18-part large-file initiation", () => {
+  const profile = VIMEO_BATCH2_PROFILES[0];
+  const objectPath = `${batch2RemotePrefix(profile)}/preservation/vimeo-727814369-source.mp4`;
+  const local = [{
+    local_path: "/private/staging/vimeo-727814369-source.mp4",
+    relative_path: "preservation/vimeo-727814369-source.mp4",
+    object_path: objectPath,
+    byte_count: 9_591_214_398,
+    sha256: "c".repeat(64),
+    content_type: "video/mp4",
+  }];
+  const signed = (query = "") => ({
+    url: `https://s3.eu-central-003.backblazeb2.com/miramonte-lapipa-archive/${objectPath}?${query}${query ? "&" : ""}X-Amz-Expires=7200&X-Amz-Signature=${"a".repeat(64)}`,
+    headers: { "x-amz-content-sha256": "UNSIGNED-PAYLOAD" },
+  });
+  const payload = {
+    session_id: "LP-VIMEO-RUN-ABCDEF0123456789",
+    accession_id: profile.accession_id,
+    video_id: profile.video_id,
+    bucket: "miramonte-lapipa-archive",
+    prefix: batch2RemotePrefix(profile),
+    objects: [{
+      ...authorizationInventory(local)[0],
+      upload_method: "s3_multipart",
+      part_size_bytes: VIMEO_BATCH2_MULTIPART_PART_BYTES,
+      part_count: 18,
+      initiate: signed("uploads="),
+      head: signed(),
+      restore: signed(),
+    }],
+  };
+  const bundle = validateBatch2TransferBundle(payload, profile, local);
+  assert.equal(bundle.objects[0].part_count, 18);
+  assert.throws(() => validateBatch2TransferBundle({
+    ...payload,
+    objects: [{ ...payload.objects[0], part_count: 17 }],
+  }, profile, local), /large-file transfer plan is invalid/);
+});
+
+test("multipart uploader resumes listed parts, completes, and restore-verifies exact SHA-256", async () => {
+  const profile = VIMEO_BATCH2_PROFILES[0];
+  const accessionRoot = await mkdtemp(path.join(tmpdir(), "lapipa-batch2-multipart-"));
+  const localPath = path.join(accessionRoot, "preservation", "vimeo-727814369-source.mp4");
+  const statePath = path.join(accessionRoot, "manifests", "multipart-upload-state.json");
+  const restoreRoot = path.join(accessionRoot, "restore-verification", "test");
+  const bytes = Buffer.from("12345678");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const objectPath = `${batch2RemotePrefix(profile)}/preservation/vimeo-727814369-source.mp4`;
+  await mkdir(path.dirname(localPath), { recursive: true });
+  await mkdir(path.dirname(statePath), { recursive: true });
+  await writeFile(localPath, bytes);
+  await writeFile(statePath, JSON.stringify({
+    schema: "https://lapipa.archive/schemas/backblaze-multipart-state/v1",
+    accession_id: profile.accession_id,
+    video_id: profile.video_id,
+    object_path: objectPath,
+    byte_count: bytes.length,
+    sha256,
+    upload_id: "upload-id-12345678",
+    created_at: "2026-08-08T00:00:00.000Z",
+    source_deletion_authorized: false,
+  }));
+  const request = (label) => ({ url: `https://b2.invalid/${label}`, headers: {} });
+  const object = {
+    local_path: localPath,
+    relative_path: "preservation/vimeo-727814369-source.mp4",
+    object_path: objectPath,
+    byte_count: bytes.length,
+    sha256,
+    content_type: "video/mp4",
+    upload_method: "s3_multipart",
+    part_size_bytes: 4,
+    part_count: 2,
+    initiate: request("initiate"),
+    head: request("initial-head"),
+    restore: request("initial-restore"),
+  };
+  const session = {
+    sessionId: "LP-VIMEO-RUN-ABCDEF0123456789",
+    runnerToken,
+    profile,
+  };
+  let completed = false;
+  const uploadedParts = [];
+  const fetchImpl = async (url, options) => {
+    const label = new URL(url).pathname.slice(1);
+    if (label === "initial-head") return new Response(null, { status: 404 });
+    if (label === "list") {
+      return new Response("<ListPartsResult><Part><PartNumber>1</PartNumber><ETag>\"etag-one\"</ETag><Size>4</Size></Part></ListPartsResult>", { status: 200 });
+    }
+    if (label === "part-2") {
+      const chunks = [];
+      for await (const chunk of options.body) chunks.push(chunk);
+      assert.equal(Buffer.concat(chunks).toString(), "5678");
+      uploadedParts.push(2);
+      return new Response(null, { status: 200, headers: { etag: '"etag-two"' } });
+    }
+    if (label === "fresh-head") {
+      if (!completed) return new Response(null, { status: 404 });
+      return new Response(null, {
+        status: 200,
+        headers: { "content-length": String(bytes.length), "x-amz-meta-sha256": sha256, etag: '"final"' },
+      });
+    }
+    if (label === "complete") {
+      assert.match(String(options.body), /etag-one/);
+      assert.match(String(options.body), /etag-two/);
+      completed = true;
+      return new Response("<CompleteMultipartUploadResult/>", { status: 200 });
+    }
+    if (label === "restore") return new Response(bytes, { status: 200 });
+    if (label === "initiate") throw new Error("resume state must prevent a second initiation");
+    throw new Error(`unexpected multipart test request: ${options.method} ${label}`);
+  };
+  const [result] = await uploadBatch2AndRestore({ objects: [object] }, session, restoreRoot, {
+    fetchImpl,
+    requestMultipartBundleImpl: async () => ({
+      list: request("list"),
+      complete: request("complete"),
+      abort: request("abort"),
+      head: request("fresh-head"),
+      restore: request("restore"),
+      parts: [
+        { part_number: 1, start_byte: 0, end_byte: 3, byte_count: 4, upload: request("part-1") },
+        { part_number: 2, start_byte: 4, end_byte: 7, byte_count: 4, upload: request("part-2") },
+      ],
+    }),
+  });
+  assert.deepEqual(uploadedParts, [2]);
+  assert.equal(result.resumed_part_count, 1);
+  assert.equal(result.multipart_part_count, 2);
+  assert.equal(result.restored_sha256, sha256);
+  await assert.rejects(access(statePath), /ENOENT/);
 });
 
 test("completed accession evidence prevents another transfer run", async () => {

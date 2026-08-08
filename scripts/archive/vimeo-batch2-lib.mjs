@@ -1,6 +1,9 @@
 import { execFile } from "node:child_process";
-import { access, lstat, mkdir, readFile, readdir, rename, statfs, writeFile } from "node:fs/promises";
+import { createReadStream, createWriteStream } from "node:fs";
+import { access, lstat, mkdir, readFile, readdir, rename, stat, statfs, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { promisify } from "node:util";
 
 import { sha256File } from "./lib.mjs";
@@ -14,6 +17,8 @@ import {
 const execFileAsync = promisify(execFile);
 export const DEFAULT_BATCH2_SESSION_URL = "https://jxilnxchvdeiazmopslf.supabase.co/functions/v1/vimeo-batch2-session";
 export const VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES = 5_000_000_000;
+export const VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES = 25_000_000_000;
+export const VIMEO_BATCH2_MULTIPART_PART_BYTES = 512 * 1024 * 1024;
 export const VIMEO_BATCH2_SPACE_RESERVE_BYTES = 20_000_000_000;
 export const TRANSCRIPT_SUFFIX = "mlx-large-v3-turbo-auto";
 
@@ -139,14 +144,14 @@ export async function authorizeBatch2Download(session, options = {}) {
   return validateBatch2DownloadAuthorization(payload, session.profile);
 }
 
-export async function assertBatch2WorkingSpace(stagingRoot, authorization) {
-  if (authorization.download.byte_count > VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES) {
+export async function assertBatch2WorkingSpace(stagingRoot, authorization, options = {}) {
+  if (authorization.download.byte_count > VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES) {
     throw new Error(
       `Vimeo reports a ${authorization.download.byte_count.toLocaleString("en")} byte source. `
-      + "It exceeds the reviewed Backblaze standard-file path; nothing was downloaded. Add the large-file path before retrying.",
+      + "It exceeds the reviewed 25 GB Batch 2 preservation limit; nothing was downloaded.",
     );
   }
-  const filesystem = await statfs(stagingRoot);
+  const filesystem = await (options.statfsImpl ?? statfs)(stagingRoot);
   const freeBytes = Number(filesystem.bavail) * Number(filesystem.bsize);
   const requiredBytes = authorization.download.byte_count * 2 + VIMEO_BATCH2_SPACE_RESERVE_BYTES;
   if (freeBytes < requiredBytes) {
@@ -155,7 +160,13 @@ export async function assertBatch2WorkingSpace(stagingRoot, authorization) {
       + `${freeBytes.toLocaleString("en")} are available. Nothing was downloaded.`,
     );
   }
-  return { free_bytes: freeBytes, required_bytes: requiredBytes };
+  return {
+    free_bytes: freeBytes,
+    required_bytes: requiredBytes,
+    upload_method: authorization.download.byte_count > VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES
+      ? "s3_multipart"
+      : "s3_put",
+  };
 }
 
 async function atomicJson(filename, value) {
@@ -460,7 +471,7 @@ export function authorizationInventory(inventory) {
   }));
 }
 
-function safeSignedRequest(value, expectedObjectPath) {
+function safeSignedRequest(value, expectedObjectPath, queryCheck = () => true) {
   if (!value || typeof value !== "object") throw new Error("The signed Batch 2 transfer request is missing.");
   const url = new URL(value.url);
   if (url.protocol !== "https:" || url.username || url.password
@@ -469,6 +480,10 @@ function safeSignedRequest(value, expectedObjectPath) {
   }
   if (decodeURIComponent(url.pathname) !== `/miramonte-lapipa-archive/${expectedObjectPath}`) {
     throw new Error("The signed Batch 2 transfer request escaped the accession path.");
+  }
+  if (!url.searchParams.has("X-Amz-Signature") || !url.searchParams.has("X-Amz-Expires")
+      || !queryCheck(url.searchParams)) {
+    throw new Error("The signed Batch 2 transfer request has an invalid operation scope.");
   }
   const headers = value.headers && typeof value.headers === "object" && !Array.isArray(value.headers)
     ? Object.fromEntries(Object.entries(value.headers).map(([name, headerValue]) => [name.toLowerCase(), String(headerValue)]))
@@ -491,14 +506,339 @@ export function validateBatch2TransferBundle(payload, profile, expectedInventory
         || record.content_type !== local.content_type) {
       throw new Error("The Batch 2 transfer bundle does not match the local fixity inventory.");
     }
+    const large = local.byte_count > VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES;
+    if (large) {
+      const expectedParts = Math.ceil(local.byte_count / VIMEO_BATCH2_MULTIPART_PART_BYTES);
+      if (record.upload_method !== "s3_multipart"
+          || record.part_size_bytes !== VIMEO_BATCH2_MULTIPART_PART_BYTES
+          || record.part_count !== expectedParts) {
+        throw new Error("The Batch 2 large-file transfer plan is invalid.");
+      }
+      return {
+        ...local,
+        upload_method: "s3_multipart",
+        part_size_bytes: record.part_size_bytes,
+        part_count: record.part_count,
+        initiate: safeSignedRequest(record.initiate, record.object_path, (query) => (
+          query.has("uploads") && !query.has("uploadId") && !query.has("partNumber")
+        )),
+        head: safeSignedRequest(record.head, record.object_path),
+        restore: safeSignedRequest(record.restore, record.object_path),
+      };
+    }
+    if (record.upload_method !== "s3_put") {
+      throw new Error("The Batch 2 standard-file transfer plan is invalid.");
+    }
     return {
       ...local,
-      upload: safeSignedRequest(record.upload, record.object_path),
+      upload_method: "s3_put",
+      upload: safeSignedRequest(record.upload, record.object_path, (query) => (
+        !query.has("uploads") && !query.has("uploadId") && !query.has("partNumber")
+      )),
       head: safeSignedRequest(record.head, record.object_path),
       restore: safeSignedRequest(record.restore, record.object_path),
     };
   });
   return { session_id: String(payload.session_id ?? ""), expires_at: String(payload.expires_at ?? ""), objects };
+}
+
+function safeUploadId(value) {
+  const uploadId = String(value ?? "");
+  if (uploadId.length < 8 || uploadId.length > 512 || /[\u0000-\u001f\u007f]/.test(uploadId)) {
+    throw new Error("The Backblaze multipart upload ID is invalid.");
+  }
+  return uploadId;
+}
+
+function validateBatch2MultipartBundle(payload, session, object, uploadId) {
+  const expectedPartCount = Math.ceil(object.byte_count / VIMEO_BATCH2_MULTIPART_PART_BYTES);
+  const exactUploadId = safeUploadId(uploadId);
+  if (!payload || typeof payload !== "object" || payload.session_id !== session.sessionId
+      || payload.accession_id !== session.profile.accession_id || payload.video_id !== session.profile.video_id
+      || payload.bucket !== "miramonte-lapipa-archive" || payload.prefix !== batch2RemotePrefix(session.profile)
+      || payload.object_path !== object.object_path || payload.byte_count !== object.byte_count
+      || payload.sha256 !== object.sha256 || payload.content_type !== object.content_type
+      || payload.upload_method !== "s3_multipart"
+      || payload.part_size_bytes !== VIMEO_BATCH2_MULTIPART_PART_BYTES
+      || payload.part_count !== expectedPartCount || !Array.isArray(payload.parts)
+      || payload.parts.length !== expectedPartCount) {
+    throw new Error("The Backblaze multipart bundle is outside the reviewed Batch 2 accession.");
+  }
+  const exactUploadQuery = (query) => query.get("uploadId") === exactUploadId && !query.has("partNumber");
+  const parts = payload.parts.map((part, index) => {
+    const partNumber = index + 1;
+    const startByte = index * VIMEO_BATCH2_MULTIPART_PART_BYTES;
+    const byteCount = Math.min(VIMEO_BATCH2_MULTIPART_PART_BYTES, object.byte_count - startByte);
+    if (part.part_number !== partNumber || part.start_byte !== startByte
+        || part.end_byte !== startByte + byteCount - 1 || part.byte_count !== byteCount) {
+      throw new Error("The Backblaze multipart part plan is invalid.");
+    }
+    return {
+      part_number: partNumber,
+      start_byte: startByte,
+      end_byte: startByte + byteCount - 1,
+      byte_count: byteCount,
+      upload: safeSignedRequest(part.upload, object.object_path, (query) => (
+        query.get("uploadId") === exactUploadId && query.get("partNumber") === String(partNumber)
+      )),
+    };
+  });
+  return {
+    expires_at: String(payload.expires_at ?? ""),
+    list: safeSignedRequest(payload.list, object.object_path, exactUploadQuery),
+    complete: safeSignedRequest(payload.complete, object.object_path, exactUploadQuery),
+    abort: safeSignedRequest(payload.abort, object.object_path, exactUploadQuery),
+    head: safeSignedRequest(payload.head, object.object_path, (query) => !query.has("uploadId")),
+    restore: safeSignedRequest(payload.restore, object.object_path, (query) => !query.has("uploadId")),
+    parts,
+  };
+}
+
+export async function requestBatch2MultipartBundle(session, object, uploadId, options = {}) {
+  const payload = await postJson(session.sessionUrl, {
+    action: "backblaze_multipart_bundle",
+    runner_token: session.runnerToken,
+    upload_id: safeUploadId(uploadId),
+    objects: authorizationInventory([object]),
+  }, options.fetchImpl ?? fetch);
+  return validateBatch2MultipartBundle(payload, session, object, uploadId);
+}
+
+function xmlValue(xml, name) {
+  const match = new RegExp(`<${name}>([\\s\\S]*?)<\\/${name}>`, "i").exec(xml);
+  if (!match) return null;
+  return match[1]
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+}
+
+function safeEtag(value) {
+  const etag = String(value ?? "").trim();
+  if (!etag || etag.length > 128 || /[\u0000-\u001f\u007f<>&]/.test(etag)) {
+    throw new Error("Backblaze returned an invalid multipart ETag.");
+  }
+  return etag;
+}
+
+function multipartStateMatches(state, session, object) {
+  return state?.schema === "https://lapipa.archive/schemas/backblaze-multipart-state/v1"
+    && state.accession_id === session.profile.accession_id
+    && state.video_id === session.profile.video_id
+    && state.object_path === object.object_path
+    && state.byte_count === object.byte_count
+    && state.sha256 === object.sha256;
+}
+
+async function readMultipartState(statePath, session, object) {
+  try {
+    const state = await jsonFile(statePath);
+    if (!multipartStateMatches(state, session, object)) {
+      throw new Error("Existing multipart resume state differs from the preservation master; it was not overwritten.");
+    }
+    return { ...state, upload_id: safeUploadId(state.upload_id) };
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function initiateMultipart(object, fetchImpl) {
+  const response = await fetchImpl(object.initiate.url, {
+    method: "POST",
+    headers: object.initiate.headers,
+    redirect: "error",
+    signal: AbortSignal.timeout(30_000),
+  });
+  const xml = await response.text();
+  if (!response.ok) throw new Error(`Backblaze multipart initiation failed (${response.status}).`);
+  return safeUploadId(xmlValue(xml, "UploadId"));
+}
+
+function listedMultipartParts(xml, expectedParts) {
+  const listed = new Map();
+  for (const match of xml.matchAll(/<Part>([\s\S]*?)<\/Part>/gi)) {
+    const partNumber = Number(xmlValue(match[1], "PartNumber"));
+    const byteCount = Number(xmlValue(match[1], "Size"));
+    const etag = safeEtag(xmlValue(match[1], "ETag"));
+    const expected = expectedParts[partNumber - 1];
+    if (!expected || byteCount !== expected.byte_count || listed.has(partNumber)) {
+      throw new Error("Existing Backblaze multipart parts do not match the reviewed upload plan.");
+    }
+    listed.set(partNumber, { part_number: partNumber, byte_count: byteCount, etag });
+  }
+  return listed;
+}
+
+async function retryPartUpload(part, object, fetchImpl) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetchImpl(part.upload.url, {
+        method: "PUT",
+        headers: part.upload.headers,
+        body: createReadStream(object.local_path, { start: part.start_byte, end: part.end_byte }),
+        duplex: "half",
+        redirect: "error",
+        signal: AbortSignal.timeout(90 * 60_000),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return safeEtag(response.headers.get("etag"));
+    } catch (error) {
+      lastError = error;
+      if (attempt === 3) break;
+    }
+  }
+  throw new Error(`Backblaze multipart part ${part.part_number} failed after three attempts: ${lastError?.message ?? "unknown error"}`);
+}
+
+function completeMultipartXml(parts) {
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<CompleteMultipartUpload xmlns="http://s3.amazonaws.com/doc/2006-03-01/">${parts.map((part) => (
+    `<Part><PartNumber>${part.part_number}</PartNumber><ETag>${part.etag}</ETag></Part>`
+  )).join("")}</CompleteMultipartUpload>`;
+}
+
+async function remoteHead(request, object, fetchImpl) {
+  const response = await fetchImpl(request.url, {
+    method: "HEAD", headers: request.headers, redirect: "error", signal: AbortSignal.timeout(30_000),
+  });
+  if (response.ok) {
+    const bytes = Number(response.headers.get("content-length"));
+    const sha256 = (response.headers.get("x-amz-meta-sha256") ?? "").toLowerCase();
+    if (bytes !== object.byte_count || sha256 !== object.sha256) {
+      throw new Error(`An existing Backblaze object differs from the local file; it was not overwritten: ${object.relative_path}.`);
+    }
+  } else if (response.status !== 404) {
+    throw new Error(`Backblaze preflight failed (${response.status}) for ${object.relative_path}.`);
+  }
+  return response;
+}
+
+async function restoreMultipartObject(object, requests, restoreRoot, fetchImpl, uploadDetails) {
+  const headResponse = await remoteHead(requests.head, object, fetchImpl);
+  if (!headResponse.ok) throw new Error(`Backblaze multipart verification failed (${headResponse.status}).`);
+  const response = await fetchImpl(requests.restore.url, {
+    method: "GET",
+    headers: requests.restore.headers,
+    redirect: "error",
+    signal: AbortSignal.timeout(6 * 60 * 60_000),
+  });
+  if (!response.ok || !response.body) throw new Error(`Backblaze restore failed (${response.status}) for ${object.relative_path}.`);
+  const restorePath = path.resolve(restoreRoot, ...object.relative_path.split("/"));
+  if (!restorePath.startsWith(`${path.resolve(restoreRoot)}${path.sep}`)) {
+    throw new Error("Restore path escaped the clean verification directory.");
+  }
+  await mkdir(path.dirname(restorePath), { recursive: true });
+  const partial = `${restorePath}.partial`;
+  await pipeline(Readable.fromWeb(response.body), createWriteStream(partial, { flags: "wx" }));
+  const restoredStat = await stat(partial);
+  const restoredSha256 = await sha256File(partial);
+  if (restoredStat.size !== object.byte_count || restoredSha256 !== object.sha256) {
+    throw new Error(`Restored fixity does not match for ${object.relative_path}; the partial restore was retained.`);
+  }
+  await rename(partial, restorePath);
+  return {
+    object_path: object.object_path,
+    relative_path: object.relative_path,
+    byte_count: object.byte_count,
+    expected_sha256: object.sha256,
+    restored_sha256: restoredSha256,
+    version_id: headResponse.headers.get("x-amz-version-id"),
+    etag: headResponse.headers.get("etag"),
+    server_side_encryption: headResponse.headers.get("x-amz-server-side-encryption"),
+    reused_existing_remote_object: uploadDetails.reused,
+    upload_method: "s3_multipart",
+    multipart_part_count: uploadDetails.part_count,
+    resumed_part_count: uploadDetails.resumed_part_count,
+    restored_path: restorePath,
+    verified: true,
+  };
+}
+
+async function abortMultipart(request, fetchImpl) {
+  const response = await fetchImpl(request.url, {
+    method: "DELETE", headers: request.headers, redirect: "error", signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok && response.status !== 404) throw new Error(`Backblaze multipart abort failed (${response.status}).`);
+}
+
+async function uploadMultipartAndRestore(initialObject, session, restoreRoot, options = {}) {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const initialHead = await remoteHead(initialObject.head, initialObject, fetchImpl);
+  if (initialHead.ok) {
+    return await restoreMultipartObject(initialObject, initialObject, restoreRoot, fetchImpl, {
+      reused: true, part_count: 0, resumed_part_count: 0,
+    });
+  }
+  const statePath = path.join(path.dirname(initialObject.local_path), "..", "manifests", "multipart-upload-state.json");
+  let state = await readMultipartState(statePath, session, initialObject);
+  if (!state) {
+    state = {
+      schema: "https://lapipa.archive/schemas/backblaze-multipart-state/v1",
+      accession_id: session.profile.accession_id,
+      video_id: session.profile.video_id,
+      object_path: initialObject.object_path,
+      byte_count: initialObject.byte_count,
+      sha256: initialObject.sha256,
+      upload_id: await initiateMultipart(initialObject, fetchImpl),
+      created_at: new Date().toISOString(),
+      source_deletion_authorized: false,
+    };
+    await atomicJson(statePath, state);
+  }
+  const requestMultipart = options.requestMultipartBundleImpl ?? requestBatch2MultipartBundle;
+  const requests = await requestMultipart(session, initialObject, state.upload_id, { fetchImpl });
+  const listResponse = await fetchImpl(requests.list.url, {
+    method: "GET", headers: requests.list.headers, redirect: "error", signal: AbortSignal.timeout(30_000),
+  });
+  const listXml = await listResponse.text();
+  if (!listResponse.ok) throw new Error(`Backblaze multipart resume check failed (${listResponse.status}).`);
+  const uploaded = listedMultipartParts(listXml, requests.parts);
+  const resumedPartCount = uploaded.size;
+  for (const part of requests.parts) {
+    if (uploaded.has(part.part_number)) continue;
+    uploaded.set(part.part_number, {
+      part_number: part.part_number,
+      byte_count: part.byte_count,
+      etag: await retryPartUpload(part, initialObject, fetchImpl),
+    });
+  }
+  const beforeComplete = await remoteHead(requests.head, initialObject, fetchImpl);
+  if (beforeComplete.ok) {
+    await abortMultipart(requests.abort, fetchImpl);
+  } else {
+    const orderedParts = [...uploaded.values()].sort((left, right) => left.part_number - right.part_number);
+    if (orderedParts.length !== requests.parts.length) throw new Error("Backblaze multipart upload is incomplete.");
+    const completion = await fetchImpl(requests.complete.url, {
+      method: "POST",
+      headers: requests.complete.headers,
+      body: completeMultipartXml(orderedParts),
+      redirect: "error",
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!completion.ok) throw new Error(`Backblaze multipart completion failed (${completion.status}).`);
+  }
+  const result = await restoreMultipartObject(initialObject, requests, restoreRoot, fetchImpl, {
+    reused: beforeComplete.ok,
+    part_count: requests.parts.length,
+    resumed_part_count: resumedPartCount,
+  });
+  await unlink(statePath).catch((error) => {
+    if (error?.code !== "ENOENT") throw error;
+  });
+  return result;
+}
+
+export async function uploadBatch2AndRestore(bundle, session, restoreRoot, options = {}) {
+  const results = [];
+  for (const object of bundle.objects) {
+    if (object.upload_method === "s3_multipart") {
+      results.push(await uploadMultipartAndRestore(object, session, restoreRoot, options));
+      continue;
+    }
+    const [result] = await uploadAndRestore({ objects: [object] }, restoreRoot, { fetchImpl: options.fetchImpl ?? fetch });
+    results.push({ ...result, upload_method: "s3_put", multipart_part_count: 0, resumed_part_count: 0 });
+  }
+  return results;
 }
 
 export async function requestBatch2TransferBundle(session, inventory, options = {}) {

@@ -7,6 +7,9 @@ export const TRANSFER_PREFIX = `lapipa/vimeo/${TRANSFER_ACCESSION_ID}`;
 export const TRANSFER_URL_TTL_SECONDS = 30 * 60;
 export const MAX_TRANSFER_OBJECTS = 12;
 export const MAX_TRANSFER_BYTES = 500_000_000;
+export const MULTIPART_PART_SIZE_BYTES = 512 * 1024 * 1024;
+export const MULTIPART_URL_TTL_SECONDS = 12 * 60 * 60;
+export const MAX_MULTIPART_OBJECT_BYTES = 25_000_000_000;
 
 const PRESERVATION_PATH =
   `${TRANSFER_PREFIX}/preservation/vimeo-${TRANSFER_VIDEO_ID}-source.mp4`;
@@ -254,18 +257,31 @@ async function hmacSha256(
 
 async function presign(
   object: TransferObject,
-  method: "PUT" | "HEAD" | "GET",
+  method: "PUT" | "HEAD" | "GET" | "POST" | "DELETE",
   config: SigningConfig,
   signingDate = new Date(),
   ttlSeconds = TRANSFER_URL_TTL_SECONDS,
+  options: {
+    query?: Record<string, string>;
+    headers?: Record<string, string>;
+    content_length?: number;
+  } = {},
 ): Promise<{ url: string; headers: Record<string, string> }> {
   const headers: Record<string, string> = {
     host: config.endpoint.hostname,
     "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
   };
-  if (method === "PUT") {
+  if (method === "PUT" && !options.headers) {
     headers["content-type"] = object.content_type;
     headers["x-amz-meta-sha256"] = object.sha256;
+  }
+  for (const [name, value] of Object.entries(options.headers ?? {})) {
+    const normalizedName = name.toLowerCase();
+    if (normalizedName === "host" || !/^[a-z0-9-]+$/.test(normalizedName)
+        || /[\r\n]/.test(value)) {
+      throw new BackblazeTransferError("invalid_signed_header", "Backblaze signed header is invalid");
+    }
+    headers[normalizedName] = value;
   }
   const canonicalHeaders = Object.entries(headers)
     .sort(([left], [right]) => left.localeCompare(right))
@@ -279,6 +295,7 @@ async function presign(
   const dateStamp = amzDate.slice(0, 8);
   const credentialScope = `${dateStamp}/${config.region}/s3/aws4_request`;
   const query: Record<string, string> = {
+    ...(options.query ?? {}),
     "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
     "X-Amz-Credential": `${config.accessKeyId}/${credentialScope}`,
     "X-Amz-Date": amzDate,
@@ -313,8 +330,12 @@ async function presign(
   const callerHeaders = Object.fromEntries(
     Object.entries(headers).filter(([name]) => name !== "host"),
   );
-  if (method === "PUT") {
-    callerHeaders["content-length"] = String(object.byte_count);
+  const contentLength = options.content_length ?? (method === "PUT" && !options.headers ? object.byte_count : null);
+  if (contentLength !== null && contentLength !== undefined) {
+    if (!Number.isSafeInteger(contentLength) || contentLength < 0) {
+      throw new BackblazeTransferError("invalid_content_length", "Backblaze content length is invalid");
+    }
+    callerHeaders["content-length"] = String(contentLength);
   }
   return {
     url:
@@ -407,12 +428,37 @@ export async function createScopedBackblazeTransferBundle(
   const expiresAt = new Date(
     issuedAt.getTime() + scope.url_ttl_seconds * 1000,
   );
-  const signedObjects = await Promise.all(scope.objects.map(async (object) => ({
-    ...object,
-    upload: await presign(object, "PUT", config, issuedAt, scope.url_ttl_seconds),
-    head: await presign(object, "HEAD", config, issuedAt, scope.url_ttl_seconds),
-    restore: await presign(object, "GET", config, issuedAt, scope.url_ttl_seconds),
-  })));
+  const signedObjects = await Promise.all(scope.objects.map(async (object) => {
+    const common = {
+      ...object,
+      head: await presign(object, "HEAD", config, issuedAt, scope.url_ttl_seconds),
+      restore: await presign(object, "GET", config, issuedAt, scope.url_ttl_seconds),
+    };
+    if (object.byte_count <= 5_000_000_000) {
+      return {
+        ...common,
+        upload_method: "s3_put",
+        upload: await presign(object, "PUT", config, issuedAt, scope.url_ttl_seconds),
+      };
+    }
+    if (object.byte_count > MAX_MULTIPART_OBJECT_BYTES) {
+      throw new BackblazeTransferError("multipart_object_too_large", "Backblaze multipart object exceeds the Batch 2 limit");
+    }
+    return {
+      ...common,
+      upload_method: "s3_multipart",
+      part_size_bytes: MULTIPART_PART_SIZE_BYTES,
+      part_count: Math.ceil(object.byte_count / MULTIPART_PART_SIZE_BYTES),
+      initiate: await presign(object, "POST", config, issuedAt, scope.url_ttl_seconds, {
+        query: { uploads: "" },
+        headers: {
+          "content-type": object.content_type,
+          "x-amz-meta-sha256": object.sha256,
+        },
+        content_length: 0,
+      }),
+    };
+  }));
   return {
     accession_id: scope.accession_id,
     video_id: scope.video_id,
@@ -421,5 +467,103 @@ export async function createScopedBackblazeTransferBundle(
     issued_at: issuedAt.toISOString(),
     expires_at: expiresAt.toISOString(),
     objects: signedObjects,
+  };
+}
+
+function normalizeUploadId(value: unknown): string {
+  const uploadId = typeof value === "string" ? value : "";
+  if (uploadId.length < 8 || uploadId.length > 512 || /[\u0000-\u001f\u007f]/.test(uploadId)) {
+    throw new BackblazeTransferError("invalid_upload_id", "Backblaze multipart upload ID is invalid");
+  }
+  return uploadId;
+}
+
+export function multipartPartPlan(byteCount: number): Array<{
+  part_number: number;
+  start_byte: number;
+  end_byte: number;
+  byte_count: number;
+}> {
+  if (!Number.isSafeInteger(byteCount) || byteCount <= 5_000_000_000
+      || byteCount > MAX_MULTIPART_OBJECT_BYTES) {
+    throw new BackblazeTransferError("invalid_multipart_size", "Backblaze multipart size is outside the Batch 2 limit");
+  }
+  const partCount = Math.ceil(byteCount / MULTIPART_PART_SIZE_BYTES);
+  return Array.from({ length: partCount }, (_, index) => {
+    const startByte = index * MULTIPART_PART_SIZE_BYTES;
+    const partBytes = Math.min(MULTIPART_PART_SIZE_BYTES, byteCount - startByte);
+    return {
+      part_number: index + 1,
+      start_byte: startByte,
+      end_byte: startByte + partBytes - 1,
+      byte_count: partBytes,
+    };
+  });
+}
+
+export async function createScopedBackblazeMultipartBundle(scope: {
+  accession_id: string;
+  video_id: string;
+  prefix: string;
+  object: TransferObject;
+  upload_id: unknown;
+}): Promise<Record<string, unknown>> {
+  if (!/^LP-ACC-2026-\d{4}$/.test(scope.accession_id)
+      || !/^\d{6,12}$/.test(scope.video_id)
+      || scope.prefix !== `lapipa/vimeo/${scope.accession_id}`
+      || !scope.object.object_path.startsWith(`${scope.prefix}/preservation/`)) {
+    throw new BackblazeTransferError("invalid_multipart_scope", "Backblaze multipart scope is invalid");
+  }
+  const uploadId = normalizeUploadId(scope.upload_id);
+  const parts = multipartPartPlan(scope.object.byte_count);
+  const bucket = requiredEnv("B2_BUCKET_NAME");
+  const status = await checkBackblazePreservationStorage() as Record<string, any>;
+  if (status.status !== "ok" || status.bucket?.name !== bucket
+      || !status.capabilities?.write_files || !status.capabilities?.read_files) {
+    throw new BackblazeTransferError("storage_not_ready", "Backblaze storage controls are not ready for multipart transfer");
+  }
+  const config = endpointConfiguration(
+    requiredEnv("B2_S3_ENDPOINT").trim(),
+    bucket,
+    requiredEnv("B2_APPLICATION_KEY_ID"),
+    requiredEnv("B2_APPLICATION_KEY"),
+  );
+  const issuedAt = new Date();
+  const expiresAt = new Date(issuedAt.getTime() + MULTIPART_URL_TTL_SECONDS * 1000);
+  const uploadQuery = { uploadId };
+  return {
+    accession_id: scope.accession_id,
+    video_id: scope.video_id,
+    bucket,
+    prefix: scope.prefix,
+    object_path: scope.object.object_path,
+    byte_count: scope.object.byte_count,
+    sha256: scope.object.sha256,
+    content_type: scope.object.content_type,
+    upload_method: "s3_multipart",
+    part_size_bytes: MULTIPART_PART_SIZE_BYTES,
+    part_count: parts.length,
+    issued_at: issuedAt.toISOString(),
+    expires_at: expiresAt.toISOString(),
+    list: await presign(scope.object, "GET", config, issuedAt, MULTIPART_URL_TTL_SECONDS, {
+      query: uploadQuery,
+    }),
+    complete: await presign(scope.object, "POST", config, issuedAt, MULTIPART_URL_TTL_SECONDS, {
+      query: uploadQuery,
+      headers: { "content-type": "application/xml" },
+    }),
+    abort: await presign(scope.object, "DELETE", config, issuedAt, MULTIPART_URL_TTL_SECONDS, {
+      query: uploadQuery,
+    }),
+    head: await presign(scope.object, "HEAD", config, issuedAt, MULTIPART_URL_TTL_SECONDS),
+    restore: await presign(scope.object, "GET", config, issuedAt, MULTIPART_URL_TTL_SECONDS),
+    parts: await Promise.all(parts.map(async (part) => ({
+      ...part,
+      upload: await presign(scope.object, "PUT", config, issuedAt, MULTIPART_URL_TTL_SECONDS, {
+        query: { partNumber: String(part.part_number), uploadId },
+        headers: {},
+        content_length: part.byte_count,
+      }),
+    }))),
   };
 }

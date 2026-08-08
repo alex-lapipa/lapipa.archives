@@ -15,7 +15,7 @@ import {
   ffprobeBatch2,
   prepareBatch2PreservationIngest,
   requestBatch2TransferBundle,
-  uploadAndRestore,
+  uploadBatch2AndRestore,
   writeBatch2DownloadManifest,
   writeBatch2IngestResult,
   writeBatch2TransferReport,
@@ -86,10 +86,10 @@ async function main() {
     const restoreRoot = path.join(accessionRoot, "restore-verification", restoreRunName());
     const bundle = await requestBatch2TransferBundle(session, prepared.inventory);
     console.log("Uploading or reusing exact matches, then restoring and hashing every object…");
-    const results = await uploadAndRestore(bundle, restoreRoot);
+    const results = await uploadBatch2AndRestore(bundle, session, restoreRoot);
     const transferReport = await writeBatch2TransferReport(accessionRoot, profile, prepared.allowed, results);
     const reportBundle = await requestBatch2TransferBundle(session, transferReport.inventory);
-    const reportResults = await uploadAndRestore(reportBundle, restoreRoot);
+    const reportResults = await uploadBatch2AndRestore(reportBundle, session, restoreRoot);
     const completeResults = [...results, ...reportResults];
     const outcome = await writeBatch2IngestResult(accessionRoot, profile, restoreRoot, completeResults);
 

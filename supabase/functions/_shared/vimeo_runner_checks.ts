@@ -9,6 +9,7 @@ import {
 } from "./vimeo_runner.ts";
 import {
   normalizeTransferObjects,
+  multipartPartPlan,
   presignTransferObjectForTest,
   TRANSFER_PREFIX,
 } from "./backblaze_transfer.ts";
@@ -20,6 +21,7 @@ import {
 } from "./vimeo_batch2_registry.mjs";
 import {
   normalizeVimeoBatch2TransferObjects,
+  VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES,
   VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES,
 } from "./vimeo_batch2_transfer.ts";
 
@@ -234,7 +236,7 @@ Deno.test("Vimeo Batch 2 registry pins five stable accessions and excludes the h
   }
 });
 
-Deno.test("Vimeo Batch 2 transfer accepts only exact accession paths and standard-size media", () => {
+Deno.test("Vimeo Batch 2 transfer accepts reviewed multipart media but retains the 25 GB ceiling", () => {
   const valid = {
     object_path: "lapipa/vimeo/LP-ACC-2026-0006/preservation/vimeo-727814369-source.mp4",
     byte_count: 1_000_000,
@@ -245,10 +247,22 @@ Deno.test("Vimeo Batch 2 transfer accepts only exact accession paths and standar
   if (normalized.profile.accession_id !== "LP-ACC-2026-0006" || normalized.objects.length !== 1) {
     throw new Error("valid Batch 2 transfer was not retained");
   }
+  const large = normalizeVimeoBatch2TransferObjects("727814369", [{
+    ...valid,
+    byte_count: 9_591_214_398,
+  }]);
+  if (large.objects[0].byte_count !== 9_591_214_398) {
+    throw new Error("reviewed multipart media was not retained");
+  }
+  const parts = multipartPartPlan(9_591_214_398);
+  if (parts.length !== 18 || parts[0].byte_count !== 536_870_912
+      || parts.at(-1)?.byte_count !== 464_408_894) {
+    throw new Error("9.6 GB multipart plan differs from the reviewed 18-part layout");
+  }
   for (const [videoId, object] of [
     ["726116068", valid],
     ["727814369", { ...valid, object_path: "lapipa/vimeo/LP-ACC-2026-0007/preservation/vimeo-727814369-source.mp4" }],
-    ["727814369", { ...valid, byte_count: VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES + 1 }],
+    ["727814369", { ...valid, byte_count: VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES + 1 }],
   ] as const) {
     try {
       normalizeVimeoBatch2TransferObjects(videoId, [object]);

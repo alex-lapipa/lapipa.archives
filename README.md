@@ -23,7 +23,7 @@ Edge Functions:
 - `kb-embed`: owner/editor-only contextual embedding of approved chunks.
 - `b2-preservation-status`: owner/editor-only, read-only verification of the configured Backblaze credential pair, exact bucket, endpoint, and preservation controls; responses are sanitized and object operations are excluded.
 - `vimeo-archive-session`: custom-authenticated, exact-scope capability broker for the completed one-video acceptance accession.
-- `vimeo-batch2-session`: custom-authenticated, owner-issued capability broker restricted to the five appraised Batch 2 accessions; provider and Backblaze credentials remain server-side.
+- `vimeo-batch2-session`: custom-authenticated, owner-issued capability broker restricted to the five appraised Batch 2 accessions; it supports exact-path single-PUT and reviewed multipart preservation while provider and Backblaze credentials remain server-side.
 
 `VOYAGE_API_KEY` and the Backblaze integration credentials are server-side Supabase Edge Function secrets. Never copy them into Vercel, a browser, GitHub, Notion, Database Vault, RAG chunks, or logs.
 
@@ -49,7 +49,7 @@ npm run archive:validate-website -- data/accessions/LP-WEB-2026-08-05
 npm run archive:vimeo -- --batch-size 5
 ```
 
-The reviewed live Batch 2 workflow is intentionally launched from Finder with `Run La Pipa Vimeo Batch 2.command`. It processes one chosen accession at a time and requires a matching ten-minute code from the signed-in Owner Access panel. The operator never deletes a source, never overwrites a differing Backblaze object, and does not silently downgrade an oversized Vimeo source.
+The reviewed live Batch 2 workflow is intentionally launched from Finder with `Run La Pipa Vimeo Batch 2.command`. It processes one chosen accession at a time and requires a matching ten-minute code from the signed-in Owner Access panel. The operator never deletes a source, never overwrites a differing Backblaze object, and does not silently downgrade an oversized Vimeo source. Preservation masters above 5 GB and no larger than 25 GB use deterministic, resumable 512 MiB S3 multipart uploads followed by a full clean restore and SHA-256 verification.
 
 Use `.env.example` as the list of required Vercel configuration names. The Vercel proxy needs only the Supabase project URL; it forwards the caller's short-lived access token and does not hold a Supabase API key. Local secret values belong only in ignored `.env.*.local` files.
 

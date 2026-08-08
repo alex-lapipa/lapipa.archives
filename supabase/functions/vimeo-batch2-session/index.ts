@@ -11,7 +11,10 @@ import {
   sha256Hex,
 } from "../_shared/vimeo_runner.ts";
 import { vimeoBatch2Profile } from "../_shared/vimeo_batch2_registry.mjs";
-import { createVimeoBatch2TransferBundle } from "../_shared/vimeo_batch2_transfer.ts";
+import {
+  createVimeoBatch2MultipartBundle,
+  createVimeoBatch2TransferBundle,
+} from "../_shared/vimeo_batch2_transfer.ts";
 
 const REQUEST_TIMEOUT_MS = 15_000;
 const corsHeaders = {
@@ -139,6 +142,14 @@ async function backblazeTransferBundle(body: Record<string, unknown>): Promise<R
   });
 }
 
+async function backblazeMultipartBundle(body: Record<string, unknown>): Promise<Response> {
+  const session = await useRunnerSession(body, "backblaze_multipart_bundle");
+  return response({
+    session_id: session.session_id,
+    ...await createVimeoBatch2MultipartBundle(session.video_id, body.objects, body.upload_id),
+  });
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== "POST") return response({ error: "method_not_allowed" }, 405);
@@ -148,6 +159,7 @@ Deno.serve(async (req: Request) => {
     if (body.action === "exchange") return await exchangeCode(body);
     if (body.action === "vimeo_download") return await vimeoDownload(body);
     if (body.action === "backblaze_transfer_bundle") return await backblazeTransferBundle(body);
+    if (body.action === "backblaze_multipart_bundle") return await backblazeMultipartBundle(body);
     return response({ error: "unknown_action" }, 400);
   } catch (error) {
     if (error instanceof TypeError || error instanceof SyntaxError) return response({ error: error.message }, 400);
