@@ -39,7 +39,9 @@ function providerPayload(byteCount = 4) {
   };
 }
 
-test("Mac launcher resolves the runner from its own directory", () => {
+test("Mac launcher resolves the runner from its own directory", {
+  skip: process.platform !== "darwin",
+}, () => {
   const launcherPath = path.join(projectRoot, "Run La Pipa One Video Acceptance.command");
   const result = spawnSync(launcherPath, {
     cwd: tmpdir(),
