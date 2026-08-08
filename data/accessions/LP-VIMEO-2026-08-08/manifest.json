@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "accession_id": "LP-ACC-2026-0004",
+  "project": "La Pipa Documentary Archive",
+  "accession_type": "vimeo_preservation_and_transcription_pilot",
+  "created_at": "2026-08-08T00:00:00Z",
+  "scope_basis": "Video identifiers previously evidenced on lapipa.io and reconciled against the authenticated Vimeo owner account.",
+  "rights": {
+    "status": "user_asserted",
+    "owner": "Alex Lawton and Miramonte, S.L.",
+    "statement": "Alex Lawton stated that he and Miramonte, S.L. own all rights related to La Pipa and this archive project."
+  },
+  "preservation_policy": {
+    "source_preference": "Preserve the Vimeo source rendition when available.",
+    "derivative_policy": "Create clearly labelled mezzanine and transcription derivatives without replacing the preservation master.",
+    "deletion_policy": "No source deletion is authorized by this accession."
+  },
+  "objects": [
+    {
+      "object_id": "LP-OBJ-VIMEO-454577632-SOURCE",
+      "vimeo_video_id": "454577632",
+      "title": "JAVIER_la pipa is la pipa_los inicios",
+      "origin_uri": "https://vimeo.com/454577632",
+      "role": "preservation_master",
+      "local_filename": "vimeo-454577632-source.mp4",
+      "b2_object_key": "lapipa/vimeo/LP-ACC-2026-0004/preservation/vimeo-454577632-source.mp4",
+      "bytes": 115314540,
+      "sha256": "46f9fb031b704e8e3ce971c0aeaefe4c17525b3c7f4912c7dd86604d24aa2ca1",
+      "duration_seconds": 66.72,
+      "dimensions": "1920x1080",
+      "codecs": ["H.264", "MPEG-4 AAC", "Timecode"],
+      "language": "es",
+      "vimeo_license": "cc0",
+      "verification_status": "downloaded_and_checksum_verified"
+    },
+    {
+      "object_id": "LP-OBJ-VIMEO-806187133-SOURCE",
+      "vimeo_video_id": "806187133",
+      "title": "Subterranea @ LA PIPA :: Miguina",
+      "origin_uri": "https://vimeo.com/806187133",
+      "role": "preservation_master",
+      "local_filename": "vimeo-806187133-source.mp4",
+      "b2_object_key": "lapipa/vimeo/LP-ACC-2026-0004/preservation/vimeo-806187133-source.mp4",
+      "bytes": 589312087,
+      "sha256": "5fbbf09015c45cfc5a499e608b7dc3fd1e52301c4f22572bec4e65afab16b4e0",
+      "duration_seconds": 77.64,
+      "dimensions": "1024x768",
+      "codecs": ["Apple ProRes 422", "Linear PCM", "Timecode"],
+      "language": null,
+      "vimeo_license": "cc0",
+      "verification_status": "downloaded_and_checksum_verified"
+    },
+    {
+      "object_id": "LP-OBJ-VIMEO-668249621-TRANSCRIPTION-1080P",
+      "vimeo_video_id": "668249621",
+      "title": "La Diáspora_LA_PIPA_Cierre2021",
+      "origin_uri": "https://vimeo.com/668249621",
+      "role": "transcription_mezzanine",
+      "local_filename": "vimeo-668249621-1080p-transcription.mp4",
+      "b2_object_key": "lapipa/vimeo/LP-ACC-2026-0004/derivatives/vimeo-668249621-1080p-transcription.mp4",
+      "bytes": 255621406,
+      "sha256": "e719a1c776a7b389e26ac643b298651d3ad7e1f185ac6a043ba683d2b51f6ed2",
+      "duration_seconds": 409.04,
+      "dimensions": "1920x1080",
+      "codecs": ["H.264", "MPEG-4 AAC"],
+      "language": "es",
+      "vimeo_license": "cc0",
+      "verification_status": "downloaded_and_checksum_verified",
+      "preservation_master": {
+        "status": "scheduled",
+        "source_bytes": 19803696412,
+        "note": "The Vimeo source master is preserved as a separate follow-up transfer because of its 19.8 GB size."
+      }
+    }
+  ]
+}

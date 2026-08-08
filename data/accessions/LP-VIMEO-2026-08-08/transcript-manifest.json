@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "accession_id": "LP-ACC-2026-0004",
+  "manifest_type": "machine_transcription_outputs",
+  "created_at": "2026-08-08T00:36:11Z",
+  "engine": {
+    "name": "mlx-whisper",
+    "version": "0.4.3",
+    "model": "mlx-community/whisper-large-v3-turbo",
+    "task": "transcribe",
+    "language": "es",
+    "word_timestamps": true
+  },
+  "quality_policy": {
+    "status": "machine_generated_provisional",
+    "human_review_required_for_canonical_status": true,
+    "rag_policy": "May be indexed with machine-generated provenance and a provisional verification label; must not be represented as a human-verified quotation.",
+    "anti_hallucination_pass": {
+      "condition_on_previous_text": false,
+      "hallucination_silence_threshold_seconds": 2,
+      "no_speech_threshold": 0.7
+    }
+  },
+  "records": [
+    {
+      "vimeo_video_id": "454577632",
+      "title": "JAVIER_la pipa is la pipa_los inicios",
+      "selected_pass": "initial_high_accuracy",
+      "quality_status": "provisional_pass",
+      "word_count": 149,
+      "notes": "Coherent Spanish speech throughout; no repeated-word hallucination detected in the selected output.",
+      "artifacts": [
+        {"format": "txt", "filename": "vimeo-454577632-mlx-large-v3-turbo-es.txt", "bytes": 798, "sha256": "d19b6dcaabdc40886990b9b1fd379016ee3af7f9e18fdf4448dc0323a5cf8a7d"},
+        {"format": "vtt", "filename": "vimeo-454577632-mlx-large-v3-turbo-es.vtt", "bytes": 956, "sha256": "7ed81f18ec93122ea65ad8caa493411bb28a9416746d0653554f05e381c033ec"},
+        {"format": "srt", "filename": "vimeo-454577632-mlx-large-v3-turbo-es.srt", "bytes": 996, "sha256": "5cb5e6d5d7507b91bc5e7ba6d837d1a8509ab6785a5c12cd87e23e9fb053624c"},
+        {"format": "json", "filename": "vimeo-454577632-mlx-large-v3-turbo-es.json", "bytes": 15791, "sha256": "27c4e2a1b2460ed1642737f7a933a9edc1f1b7a4b1cb9701940d82d35b2ab755"},
+        {"format": "tsv", "filename": "vimeo-454577632-mlx-large-v3-turbo-es.tsv", "bytes": 884, "sha256": "a2c88f38e90d001b34c93e49914b3b6f2f2bfa8b7834b5d73be63d3e422c5d0f"}
+      ]
+    },
+    {
+      "vimeo_video_id": "806187133",
+      "title": "Subterranea @ LA PIPA :: Miguina",
+      "selected_pass": "anti_hallucination_qa2",
+      "quality_status": "provisional_pass_with_proper_noun_review",
+      "word_count": 187,
+      "notes": "Second pass removed repeated closing hallucinations. Asturian and Jamaican music terms require human review.",
+      "artifacts": [
+        {"format": "txt", "filename": "vimeo-806187133-mlx-large-v3-turbo-es-qa2.txt", "bytes": 1137, "sha256": "b8b6c3282fbb7e262e9d533fb2fee2be840b0af01532259ed95eb2017565eaab"},
+        {"format": "vtt", "filename": "vimeo-806187133-mlx-large-v3-turbo-es-qa2.vtt", "bytes": 1545, "sha256": "68575766e36b86644b39275f973447aaf2d89b1434a32e15883302fea106a190"},
+        {"format": "srt", "filename": "vimeo-806187133-mlx-large-v3-turbo-es-qa2.srt", "bytes": 1672, "sha256": "c92d8d9b231c687b6c5db0ca2d3f8e70d1a09ac8e96dfc911e804d38f726a04f"},
+        {"format": "json", "filename": "vimeo-806187133-mlx-large-v3-turbo-es-qa2.json", "bytes": 22220, "sha256": "e440286a90111e7a80ec5b2808cc496f18e9452d6db53224f2840ad0c67bcd8a"},
+        {"format": "tsv", "filename": "vimeo-806187133-mlx-large-v3-turbo-es-qa2.tsv", "bytes": 1338, "sha256": "1d8c7a5f1ee20abb0d34322cf7c43389582a550eb2052a028052a83538cbc3e0"}
+      ],
+      "provider_caption": {
+        "filename": "vimeo-806187133-vimeo-autogen-en.vtt",
+        "language": "en-x-autogen",
+        "bytes": 252,
+        "sha256": "5ea07c462d16f9696d1d73014d1ff0bcedf94b6e21c2e369a6d0e29b1de39342",
+        "quality_status": "retained_as_provider_evidence_not_authoritative"
+      }
+    },
+    {
+      "vimeo_video_id": "668249621",
+      "title": "La Diáspora_LA_PIPA_Cierre2021",
+      "selected_pass": "anti_hallucination_qa2",
+      "quality_status": "provisional_pass_with_proper_noun_review",
+      "word_count": 792,
+      "notes": "Second pass removed prompt-loop hallucinations and captured the spoken programme. Event and participant names require human review.",
+      "artifacts": [
+        {"format": "txt", "filename": "vimeo-668249621-mlx-large-v3-turbo-es-qa2.txt", "bytes": 4459, "sha256": "252ed5b368d3e5eb2e479a56439873046f0357f7dcaaf25a51893142c911999c"},
+        {"format": "vtt", "filename": "vimeo-668249621-mlx-large-v3-turbo-es-qa2.vtt", "bytes": 6517, "sha256": "3a591c66e8c3aae3f2f9f7aba9d59354213eefb3189f6c27493fe8a2aba141e0"},
+        {"format": "srt", "filename": "vimeo-668249621-mlx-large-v3-turbo-es-qa2.srt", "bytes": 7238, "sha256": "fc1aea67a47e279fdf1231ce61e778ab182674dda218f56fb63199fcc2b93677"},
+        {"format": "json", "filename": "vimeo-668249621-mlx-large-v3-turbo-es-qa2.json", "bytes": 97302, "sha256": "9752149985bd6940d8b777296707ee849e06fc2df9460f05f875c6ffb554c32d"},
+        {"format": "tsv", "filename": "vimeo-668249621-mlx-large-v3-turbo-es-qa2.tsv", "bytes": 5615, "sha256": "d32b768f72432f934fe4a54a30dccec689646e66070c5538eb556dbe046ab9f6"}
+      ]
+    }
+  ]
+}

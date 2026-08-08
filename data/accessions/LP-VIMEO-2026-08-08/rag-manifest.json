@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "accession_id": "LP-ACC-2026-0004",
+  "created_at": "2026-08-08T00:36:11Z",
+  "source_count": 3,
+  "transcript_count": 3,
+  "transcript_segment_count": 104,
+  "chunk_count": 4,
+  "embedding": {
+    "provider": "voyage",
+    "model": "voyage-context-4",
+    "dimensions": 1024,
+    "status": "queued"
+  },
+  "quality": {
+    "status": "machine_generated_provisional",
+    "human_review_required": true
+  },
+  "file_sha256": {
+    "sources.jsonl": "fcbce0470ff3953783699317533e600f23398d3ac7891d43f0cfec286598c587",
+    "chunks.jsonl": "e02159c39aa5a33e65c80730ace20cb4c81e1e2d6298257ffda56af3a96ca49b",
+    "segments.jsonl": "292032c5e554b6e6a5ed8af599f225dc8e51be6bfbccf41dfd0bc29fef85b2a7"
+  }
+}
