@@ -20,7 +20,7 @@ The selected item is intentionally not one of the ReMotive-labelled entries show
 5. Supabase uses the Vimeo token held in Edge Function secrets to request the provider download record.
 6. The signed provider URL remains in Mac process memory only and is never placed in source control, the database, logs, or the archive manifest.
 
-The database verifies the immutable `owner` role before issuing the code. The mixed browser-and-terminal Edge Function performs its own authorization checks; its gateway JWT check is therefore disabled deliberately while each action is authenticated inside the handler.
+The database verifies the immutable `owner` role before issuing the code. Direct anonymous and authenticated access to the capability table is denied by grants, RLS, and an explicit restrictive policy. The mixed browser-and-terminal Edge Function performs its own authorization checks; its gateway JWT check is therefore disabled deliberately while each action is authenticated inside the handler.
 
 ## Owner procedure after deployment
 
