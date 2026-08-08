@@ -30,9 +30,20 @@ test("Vimeo planner selects five pending allowlisted videos deterministically", 
   assert.equal(first.allowlisted_count, 78);
   assert.equal(first.processed_count, 3);
   assert.equal(first.pending_count, 75);
+  assert.equal(first.eligible_pending_count, 74);
+  assert.equal(first.held_count, 1);
   assert.equal(first.selected_count, 5);
   assert.deepEqual(first, second);
+  assert.deepEqual(first.selected.map((video) => video.vimeo_video_id), [
+    "727814369",
+    "727847829",
+    "729180279",
+    "730068690",
+    "732187995",
+  ]);
+  assert.deepEqual(first.held.map((video) => video.vimeo_video_id), ["726116068"]);
   assert.ok(first.selected.every((video) => !processedIds.has(video.vimeo_video_id)));
+  assert.ok(first.selected.every((video) => video.appraisal_status === "eligible"));
   assert.ok(allowlist.every((video) => video.origin_uri === `https://vimeo.com/${video.vimeo_video_id}`));
   assert.deepEqual(first.controls, {
     network_requests: false,
@@ -40,8 +51,17 @@ test("Vimeo planner selects five pending allowlisted videos deterministically", 
     downloads_started: false,
     uploads_started: false,
     embeddings_requested: false,
+    owner_review_holds_enforced: true,
     source_deletion_authorized: false,
   });
+});
+
+test("Vimeo planner fails closed when a held item lacks an explicit decision", async () => {
+  const policy = await loadArchiveScopePolicy();
+  const records = parseJsonLines(await readFile(websiteSourcesPath, "utf8"), websiteSourcesPath);
+  const malformed = structuredClone(policy);
+  malformed.vimeo_appraisal.held_video_ids[0].decision = "maybe";
+  assert.throws(() => buildVimeoAllowlist(records, malformed), /requires an owner-scope-review decision/i);
 });
 
 test("Vimeo allowlist rejects Vumi material before selection", async () => {

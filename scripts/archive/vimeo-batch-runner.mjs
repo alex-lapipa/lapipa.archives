@@ -55,6 +55,8 @@ function formatPlan(plan, prerequisites) {
     `  Vimeo videos evidenced by lapipa.io: ${plan.allowlisted_count}`,
     `  Already processed: ${plan.processed_count}`,
     `  Remaining before this proposed batch: ${plan.pending_count}`,
+    `  Eligible after appraisal: ${plan.eligible_pending_count}`,
+    `  Held for owner scope review: ${plan.held_count}`,
     `  Proposed batch: ${plan.selected_count}`,
     "",
     "Proposed videos (oldest provider date first)",
@@ -68,11 +70,21 @@ function formatPlan(plan, prerequisites) {
     );
   }
 
+  lines.push("", "Held outside this batch");
+  if (!plan.held.length) lines.push("  No pending videos are held for owner scope review.");
+  for (const video of plan.held) {
+    lines.push(
+      `  ${video.title}`,
+      `  Vimeo ${video.vimeo_video_id} · ${video.appraisal_reason}`,
+    );
+  }
+
   lines.push(
     "",
     "Safety result",
     "  DRY RUN PASSED: this plan had zero side effects.",
-    "  Live execution remains locked until the secure operator functions and one-video acceptance test are reviewed.",
+    "  Held items were not selected.",
+    "  Live batch execution remains locked until a dedicated operator and the exact Batch 2 selection are reviewed.",
   );
   return lines.join("\n");
 }

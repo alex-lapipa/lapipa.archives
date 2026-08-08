@@ -70,6 +70,17 @@ export function buildVimeoAllowlist(records, scopePolicy) {
     && record?.metadata?.kind === "video"
   ));
   const seen = new Set();
+  const heldVideos = new Map();
+
+  for (const entry of scopePolicy.vimeo_appraisal?.held_video_ids ?? []) {
+    const id = String(entry?.video_id ?? "");
+    if (!/^\d{6,12}$/.test(id)) throw new Error(`invalid held Vimeo identifier: ${id || "missing"}`);
+    if (heldVideos.has(id)) throw new Error(`duplicate held Vimeo identifier: ${id}`);
+    if (entry.decision !== "owner_scope_review_required" || !entry.reason) {
+      throw new Error(`held Vimeo ${id} requires an owner-scope-review decision and reason`);
+    }
+    heldVideos.set(id, entry);
+  }
 
   const allowlist = videos.map((record) => {
     const id = String(record.metadata.external_id ?? "");
@@ -102,6 +113,7 @@ export function buildVimeoAllowlist(records, scopePolicy) {
     }
 
     const duration = Number(record.metadata.oembed?.duration);
+    const appraisal = heldVideos.get(id);
     return {
       vimeo_video_id: id,
       source_id: record.source_id,
@@ -111,11 +123,16 @@ export function buildVimeoAllowlist(records, scopePolicy) {
       duration_seconds: Number.isFinite(duration) && duration >= 0 ? duration : null,
       discovery_evidence: "lapipa.io captured source",
       verification_status: record.verification_status,
+      appraisal_status: appraisal?.decision ?? "eligible",
+      appraisal_reason: appraisal?.reason ?? null,
     };
   });
 
   if (allowlist.length !== EXPECTED_ALLOWLIST_COUNT) {
     throw new Error(`expected ${EXPECTED_ALLOWLIST_COUNT} lapipa.io-evidenced Vimeo videos, found ${allowlist.length}`);
+  }
+  for (const id of heldVideos.keys()) {
+    if (!seen.has(id)) throw new Error(`held Vimeo identifier is absent from the lapipa.io evidence inventory: ${id}`);
   }
 
   return allowlist.sort((left, right) => {
@@ -155,7 +172,9 @@ export async function loadProcessedVimeoIds(accessionsRoot) {
 
 export function createVimeoBatchPlan({ allowlist, processedIds, batchSize }) {
   const pending = allowlist.filter((record) => !processedIds.has(record.vimeo_video_id));
-  const selected = pending.slice(0, batchSize);
+  const held = pending.filter((record) => record.appraisal_status === "owner_scope_review_required");
+  const eligible = pending.filter((record) => record.appraisal_status === "eligible");
+  const selected = eligible.slice(0, batchSize);
   return {
     schema: "https://lapipa.archive/schemas/vimeo-batch-plan/v1",
     mode: "dry_run",
@@ -163,15 +182,19 @@ export function createVimeoBatchPlan({ allowlist, processedIds, batchSize }) {
     allowlisted_count: allowlist.length,
     processed_count: allowlist.length - pending.length,
     pending_count: pending.length,
+    eligible_pending_count: eligible.length,
+    held_count: held.length,
     selected_count: selected.length,
     batch_size: batchSize,
     selected,
+    held,
     controls: {
       network_requests: false,
       files_written: false,
       downloads_started: false,
       uploads_started: false,
       embeddings_requested: false,
+      owner_review_holds_enforced: true,
       source_deletion_authorized: false,
     },
   };
