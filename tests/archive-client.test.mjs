@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import {
   isOwnerRole,
   normalizeArchiveResults,
@@ -51,4 +52,12 @@ test("owner Vimeo authorization accepts only the exact acceptance video and safe
     authorization_code: "LP-ABCD-EFGH-JKMN-PQRS-TUVW",
     code_expires_at: safeExpiry,
   }), /outside the approved video scope/);
+});
+
+test("owner preservation consent names the exact upload and deletion boundary", async () => {
+  const html = await readFile(new URL("../site/index.html", import.meta.url), "utf8");
+  assert.match(html, /LP-ACC-2026-0005/);
+  assert.match(html, /eleven named Backblaze upload-and-read-back paths/);
+  assert.match(html, /cannot delete, overwrite a differing object/);
+  assert.doesNotMatch(html, /It cannot upload/);
 });
