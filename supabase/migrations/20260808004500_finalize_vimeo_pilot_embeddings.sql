@@ -20,24 +20,31 @@ begin
     and m.model = 'voyage-context-4'
     and m.dimensions = 1024;
 
-  if active_embedding_count <> 4 then
-    raise exception 'Vimeo pilot embedding finalization expected 4 active current embeddings, found %',
-      active_embedding_count;
+  if active_embedding_count = 4 then
+    update ops.ingestion_jobs
+    set status = 'succeeded',
+        counts = counts || '{"embeddings_pending":0,"embeddings_active":4}'::jsonb,
+        error_summary = null,
+        completed_at = coalesce(completed_at, now())
+    where job_id = 'LP-INGEST-VIMEO-PILOT-2026-08-08';
+  else
+    update ops.ingestion_jobs
+    set status = 'queued',
+        counts = counts || jsonb_build_object(
+          'embeddings_pending', 4 - active_embedding_count,
+          'embeddings_active', active_embedding_count
+        ),
+        error_summary = 'Voyage context-4 embeddings require the controlled runtime ingestion step.',
+        completed_at = null
+    where job_id = 'LP-INGEST-VIMEO-PILOT-2026-08-08';
   end if;
 end
 $$;
 
-update ops.ingestion_jobs
-set status = 'succeeded',
-    counts = counts || '{"embeddings_pending":0,"embeddings_active":4}'::jsonb,
-    error_summary = null,
-    completed_at = coalesce(completed_at, now())
-where job_id = 'LP-INGEST-VIMEO-PILOT-2026-08-08';
-
 insert into ops.schema_versions (version, description)
 values (
   '2026-08-08-vimeo-preservation-pilot-embeddings-v1',
-  'Validated four current Voyage context-4 embeddings for accession LP-ACC-2026-0004 and finalized the pilot ingestion job.'
+  'Conditionally finalizes accession LP-ACC-2026-0004 when four current Voyage context-4 embeddings exist; otherwise leaves the controlled runtime embedding step queued.'
 )
 on conflict (version) do nothing;
 
