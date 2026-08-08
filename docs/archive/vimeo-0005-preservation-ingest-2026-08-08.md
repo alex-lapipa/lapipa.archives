@@ -1,6 +1,6 @@
 # LP-DOC-ARCH-030 — Vimeo accession LP-ACC-2026-0005
 
-Status: preservation ingest verified; catalogue and RAG registration prepared
+Status: preservation, catalogue, RAG, retrieval, and graph acceptance passed
 Evidence date: 8 August 2026
 Owner: Alex Lawton / Miramonte, S.L.
 Access: restricted preservation evidence
@@ -49,6 +49,14 @@ The speech after approximately 00:27 contains obvious recognition uncertainty. T
 
 No credential, access token, owner capability, signed URL, or secret value is included in this record.
 
+## Supabase RAG and graph acceptance
+
+Supabase registration completed for the accession, three representations, 11 canonical file objects, 11 verified Backblaze copies, 11 passing fixity checks, three technical essence tracks, six preservation events, ten unreviewed transcript segments, five restricted RAG chunks, four knowledge-graph relationships, and one documented knowledge event.
+
+Voyage embedded all five chunks with `voyage-context-4` at 1,024 dimensions. The fixed acceptance question—whether Vimeo `844151157` was clean-restore verified and whether its machine transcript could be quoted as verified—returned `LP-RAG-035` first with similarity `0.533008`. That result is correct because `LP-RAG-035` states the human-review and quotation boundary. The embedding job finished with five embedded, zero pending, and no stale content hashes.
+
+The one-time Edge Function was deleted immediately after the accepted run. All six accession-specific service-role database functions were removed by the finalization migration. Supabase's post-change security advisor reported no findings.
+
 ## Continuing controls
 
-The next controlled steps are to register the accession, 11 canonical file objects and copies, 11 passing fixity checks, preservation events, technical tracks, transcript segments, provenance-linked RAG chunks, Voyage `voyage-context-4` embeddings, and knowledge-graph relationships in Supabase. A human Spanish-language transcript review remains open. Source deletion remains prohibited until an explicit later disposal decision confirms independent copies, restore evidence, rights review, and owner approval.
+The preservation, catalogue, RAG, retrieval, and graph stages are complete for this accession. A human Spanish-language transcript review remains open, and the next periodic fixity verification is due 6 November 2026. Source deletion remains prohibited until an explicit later disposal decision confirms independent copies, restore evidence, rights review, and owner approval.

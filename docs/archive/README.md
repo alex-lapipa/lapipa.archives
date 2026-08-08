@@ -42,6 +42,7 @@ This handbook governs the documentary archive layer. The existing knowledge base
 27. [LP-DOC-ARCH-028 — Batch 1 deduplication and package evidence — 8 August 2026](batch-1-deduplication-and-package-evidence-2026-08-08.md)
 28. [Vimeo terminal runner — safe planning release](vimeo-terminal-runner.md)
 29. [LP-DOC-ARCH-029 — Vimeo one-video acceptance](vimeo-one-video-acceptance.md)
+30. [LP-DOC-ARCH-030 — Vimeo accession LP-ACC-2026-0005 preservation ingest](vimeo-0005-preservation-ingest-2026-08-08.md)
 
 ## Standards profile
 
@@ -75,7 +76,7 @@ The implementation is an application profile, not a claim of formal certificatio
 
 ## Current maturity boundary
 
-The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, an assigned human owner, and one tested independent online Backblaze B2 preservation copy. The first BagIt pilot has completed upload, five object-level SHA-256 checks, and a clean restore. The platform does not yet claim trustworthy digital repository certification, full three-copy redundancy, an isolated third copy, preservation-format normalization for all media, or public availability. Those outcomes require continuing fixity evidence, representative audiovisual processing, a backup administrator, and release review.
+The platform has a working private knowledge/RAG foundation, a standards-aligned archival schema, an assigned human owner, and tested independent online Backblaze B2 preservation storage. The first BagIt pilot completed upload, five object-level SHA-256 checks, and a clean restore. Vimeo accession `LP-ACC-2026-0005` then completed source-quality audiovisual capture, local technical characterization and provisional transcription, 11-object Backblaze upload, clean restore, 11 SHA-256 checks, Supabase catalogue and graph registration, Voyage embedding, and retrieval acceptance. The platform does not yet claim trustworthy digital repository certification, full three-copy redundancy, an isolated third copy, preservation-format normalization for all media, or public availability. Those outcomes require continuing fixity evidence, broader representative audiovisual batches, a backup administrator, and release review.
 
 ## Authoritative references
 
