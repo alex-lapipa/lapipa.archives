@@ -1,5 +1,6 @@
 import {
   BackblazeTransferError,
+  createScopedBackblazeMultipartBundle,
   createScopedBackblazeTransferBundle,
   type TransferObject,
 } from "./backblaze_transfer.ts";
@@ -7,6 +8,7 @@ import { vimeoBatch2Profile } from "./vimeo_batch2_registry.mjs";
 
 export const VIMEO_BATCH2_URL_TTL_SECONDS = 2 * 60 * 60;
 export const VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES = 5_000_000_000;
+export const VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES = 25_000_000_000;
 const MAX_DERIVATIVE_BYTES = 50_000_000;
 const MAX_OBJECTS = 12;
 
@@ -75,8 +77,8 @@ export function normalizeVimeoBatch2TransferObjects(
     }
     if (objectPath.startsWith(preservationPrefix)) {
       mediaCount += 1;
-      if (byteCount > VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES) {
-        throw new BackblazeTransferError("multipart_required", "Preservation master requires the reviewed large-file path");
+      if (byteCount > VIMEO_BATCH2_MAX_MULTIPART_FILE_BYTES) {
+        throw new BackblazeTransferError("preservation_master_too_large", "Preservation master exceeds the reviewed Batch 2 limit");
       }
     } else if (byteCount > MAX_DERIVATIVE_BYTES) {
       throw new BackblazeTransferError("derivative_too_large", "Batch 2 derivative exceeds its size limit");
@@ -88,6 +90,25 @@ export function normalizeVimeoBatch2TransferObjects(
     throw new BackblazeTransferError("multiple_preservation_masters", "Only one preservation master is permitted per accession");
   }
   return { profile, objects };
+}
+
+export async function createVimeoBatch2MultipartBundle(
+  videoId: unknown,
+  value: unknown,
+  uploadId: unknown,
+): Promise<Record<string, unknown>> {
+  const { profile, objects } = normalizeVimeoBatch2TransferObjects(videoId, value);
+  if (objects.length !== 1 || objects[0].byte_count <= VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES
+      || !objects[0].object_path.includes("/preservation/")) {
+    throw new BackblazeTransferError("invalid_multipart_object", "Multipart authorization requires one reviewed large preservation master");
+  }
+  return await createScopedBackblazeMultipartBundle({
+    accession_id: String(profile.accession_id),
+    video_id: String(profile.video_id),
+    prefix: `lapipa/vimeo/${profile.accession_id}`,
+    object: objects[0],
+    upload_id: uploadId,
+  });
 }
 
 export async function createVimeoBatch2TransferBundle(

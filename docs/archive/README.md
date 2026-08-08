@@ -44,6 +44,8 @@ This handbook governs the documentary archive layer. The existing knowledge base
 29. [LP-DOC-ARCH-029 — Vimeo one-video acceptance](vimeo-one-video-acceptance.md)
 30. [LP-DOC-ARCH-030 — Vimeo accession LP-ACC-2026-0005 preservation ingest](vimeo-0005-preservation-ingest-2026-08-08.md)
 31. [LP-DOC-ARCH-031 — Vimeo Batch 2 appraisal — 8 August 2026](vimeo-batch2-appraisal-2026-08-08.md)
+32. [LP-DOC-ARCH-032 — Vimeo Batch 2 preservation operator](vimeo-batch2-operator.md)
+33. [LP-DOC-ARCH-033 — Vimeo Batch 2 large-file preservation path — 8 August 2026](vimeo-batch2-large-file-preservation-2026-08-08.md)
 
 ## Standards profile
 
