@@ -1,7 +1,7 @@
 ---
 document_id: LP-DOC-ARCH-031
 title: Vimeo Batch 2 Appraisal
-status: in_review
+status: final
 evidence_class: workspace_verified
 reviewed_on: 2026-08-08
 owner: Alex Lawton / Miramonte, S.L.
@@ -44,6 +44,6 @@ Vimeo `726116068`, **ReMotive Media - Análisis del Viaje del Consumidor para Ho
 - Local MLX Whisper and cached `whisper-large-v3-turbo`: ready.
 - Cloud credential values were not inspected or printed.
 
-## Next gate
+## Acceptance and next gate
 
-Review this exact five-video selection, then implement the dedicated Batch 2 operator. The held item requires a separate explicit owner decision or stronger La Pipa provenance.
+The exact five-video selection was accepted through merged GitHub PR 28 on 8 August 2026. The dedicated operator is specified in `LP-DOC-ARCH-032`. The held item still requires a separate explicit owner decision or stronger La Pipa provenance.

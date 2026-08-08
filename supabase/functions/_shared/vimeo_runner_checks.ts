@@ -12,6 +12,16 @@ import {
   presignTransferObjectForTest,
   TRANSFER_PREFIX,
 } from "./backblaze_transfer.ts";
+import {
+  assertVimeoBatch2Registry,
+  VIMEO_BATCH2_ACCESSION_IDS,
+  VIMEO_BATCH2_HELD_VIDEO_IDS,
+  VIMEO_BATCH2_VIDEO_IDS,
+} from "./vimeo_batch2_registry.mjs";
+import {
+  normalizeVimeoBatch2TransferObjects,
+  VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES,
+} from "./vimeo_batch2_transfer.ts";
 
 const acceptedMedia = {
   object_path: `${TRANSFER_PREFIX}/preservation/vimeo-844151157-source.mp4`,
@@ -200,5 +210,51 @@ Deno.test("Backblaze signatures are HTTPS, exact-path, expiring, and never autho
       "de04ce45951105039932c53447f317a3d213bc42126190665b533720dd30cb8a"
   ) {
     throw new Error("signature differs from the pinned AWS SigV4 reference");
+  }
+});
+
+Deno.test("Vimeo Batch 2 registry pins five stable accessions and excludes the held item", () => {
+  if (!assertVimeoBatch2Registry()) throw new Error("registry did not validate");
+  const expectedVideos = ["727814369", "727847829", "729180279", "730068690", "732187995"];
+  const expectedAccessions = [
+    "LP-ACC-2026-0006",
+    "LP-ACC-2026-0007",
+    "LP-ACC-2026-0008",
+    "LP-ACC-2026-0009",
+    "LP-ACC-2026-0010",
+  ];
+  if (JSON.stringify(VIMEO_BATCH2_VIDEO_IDS) !== JSON.stringify(expectedVideos)) {
+    throw new Error("Batch 2 Vimeo identifiers changed");
+  }
+  if (JSON.stringify(VIMEO_BATCH2_ACCESSION_IDS) !== JSON.stringify(expectedAccessions)) {
+    throw new Error("Batch 2 accession identifiers changed");
+  }
+  if (JSON.stringify(VIMEO_BATCH2_HELD_VIDEO_IDS) !== JSON.stringify(["726116068"])) {
+    throw new Error("held Vimeo identifier changed");
+  }
+});
+
+Deno.test("Vimeo Batch 2 transfer accepts only exact accession paths and standard-size media", () => {
+  const valid = {
+    object_path: "lapipa/vimeo/LP-ACC-2026-0006/preservation/vimeo-727814369-source.mp4",
+    byte_count: 1_000_000,
+    sha256: "a".repeat(64),
+    content_type: "video/mp4",
+  };
+  const normalized = normalizeVimeoBatch2TransferObjects("727814369", [valid]);
+  if (normalized.profile.accession_id !== "LP-ACC-2026-0006" || normalized.objects.length !== 1) {
+    throw new Error("valid Batch 2 transfer was not retained");
+  }
+  for (const [videoId, object] of [
+    ["726116068", valid],
+    ["727814369", { ...valid, object_path: "lapipa/vimeo/LP-ACC-2026-0007/preservation/vimeo-727814369-source.mp4" }],
+    ["727814369", { ...valid, byte_count: VIMEO_BATCH2_MAX_STANDARD_FILE_BYTES + 1 }],
+  ] as const) {
+    try {
+      normalizeVimeoBatch2TransferObjects(videoId, [object]);
+      throw new Error("invalid Batch 2 transfer was accepted");
+    } catch (error) {
+      if (!(error instanceof Error) || error.message.includes("was accepted")) throw error;
+    }
   }
 });

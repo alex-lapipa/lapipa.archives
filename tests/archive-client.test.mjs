@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import {
   isOwnerRole,
   normalizeArchiveResults,
+  normalizeVimeoBatch2Authorization,
   normalizeVimeoRunnerAuthorization,
   ownerRedirectUrl,
 } from "../site/archive-client.mjs";
@@ -56,8 +57,28 @@ test("owner Vimeo authorization accepts only the exact acceptance video and safe
 
 test("owner preservation consent names the exact upload and deletion boundary", async () => {
   const html = await readFile(new URL("../site/index.html", import.meta.url), "utf8");
-  assert.match(html, /LP-ACC-2026-0005/);
-  assert.match(html, /eleven named Backblaze upload-and-read-back paths/);
-  assert.match(html, /cannot delete, overwrite a differing object/);
+  assert.match(html, /Authorize one Batch 2 accession/);
+  assert.match(html, /five appraised La Pipa recordings/);
+  assert.match(html, /cannot delete a source or overwrite a differing remote object/);
   assert.doesNotMatch(html, /It cannot upload/);
+});
+
+test("owner Batch 2 authorization binds the code to the selected stable accession", () => {
+  const safeExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const authorization = normalizeVimeoBatch2Authorization({
+    video_id: "727814369",
+    accession_id: "LP-ACC-2026-0006",
+    title: "Data Clean Rooms: Remotive@LA PIPA",
+    authorization_code: "lp-abcd-efgh-jkmn-pqrs-tuvw",
+    code_expires_at: safeExpiry,
+  }, "727814369");
+  assert.equal(authorization.videoId, "727814369");
+  assert.equal(authorization.accessionId, "LP-ACC-2026-0006");
+  assert.equal(authorization.code, "LP-ABCD-EFGH-JKMN-PQRS-TUVW");
+  assert.throws(() => normalizeVimeoBatch2Authorization({
+    video_id: "727814369",
+    accession_id: "LP-ACC-2026-0007",
+    authorization_code: "LP-ABCD-EFGH-JKMN-PQRS-TUVW",
+    code_expires_at: safeExpiry,
+  }, "727814369"), /outside the selected Batch 2 accession/);
 });

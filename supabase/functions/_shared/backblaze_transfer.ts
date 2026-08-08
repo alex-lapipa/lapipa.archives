@@ -257,6 +257,7 @@ async function presign(
   method: "PUT" | "HEAD" | "GET",
   config: SigningConfig,
   signingDate = new Date(),
+  ttlSeconds = TRANSFER_URL_TTL_SECONDS,
 ): Promise<{ url: string; headers: Record<string, string> }> {
   const headers: Record<string, string> = {
     host: config.endpoint.hostname,
@@ -281,7 +282,7 @@ async function presign(
     "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
     "X-Amz-Credential": `${config.accessKeyId}/${credentialScope}`,
     "X-Amz-Date": amzDate,
-    "X-Amz-Expires": String(TRANSFER_URL_TTL_SECONDS),
+    "X-Amz-Expires": String(ttlSeconds),
     "X-Amz-SignedHeaders": signedHeaders,
   };
   const canonicalQuery = Object.entries(query)
@@ -349,6 +350,39 @@ export async function createBackblazeTransferBundle(
   value: unknown,
 ): Promise<Record<string, unknown>> {
   const objects = normalizeTransferObjects(value);
+  return await createScopedBackblazeTransferBundle({
+    accession_id: TRANSFER_ACCESSION_ID,
+    video_id: TRANSFER_VIDEO_ID,
+    prefix: TRANSFER_PREFIX,
+    objects,
+    url_ttl_seconds: TRANSFER_URL_TTL_SECONDS,
+  });
+}
+
+export async function createScopedBackblazeTransferBundle(
+  scope: {
+    accession_id: string;
+    video_id: string;
+    prefix: string;
+    objects: TransferObject[];
+    url_ttl_seconds: number;
+  },
+): Promise<Record<string, unknown>> {
+  if (!/^LP-ACC-2026-\d{4}$/.test(scope.accession_id)
+      || !/^\d{6,12}$/.test(scope.video_id)
+      || scope.prefix !== `lapipa/vimeo/${scope.accession_id}`
+      || !Number.isInteger(scope.url_ttl_seconds)
+      || scope.url_ttl_seconds < 60
+      || scope.url_ttl_seconds > 7_200
+      || !Array.isArray(scope.objects)
+      || scope.objects.length < 1
+      || scope.objects.length > MAX_TRANSFER_OBJECTS
+      || scope.objects.some((object) => !object.object_path.startsWith(`${scope.prefix}/`))) {
+    throw new BackblazeTransferError(
+      "invalid_transfer_scope",
+      "Backblaze transfer scope is invalid",
+    );
+  }
   const bucket = requiredEnv("B2_BUCKET_NAME");
   const status = await checkBackblazePreservationStorage() as Record<
     string,
@@ -371,19 +405,19 @@ export async function createBackblazeTransferBundle(
   );
   const issuedAt = new Date();
   const expiresAt = new Date(
-    issuedAt.getTime() + TRANSFER_URL_TTL_SECONDS * 1000,
+    issuedAt.getTime() + scope.url_ttl_seconds * 1000,
   );
-  const signedObjects = await Promise.all(objects.map(async (object) => ({
+  const signedObjects = await Promise.all(scope.objects.map(async (object) => ({
     ...object,
-    upload: await presign(object, "PUT", config, issuedAt),
-    head: await presign(object, "HEAD", config, issuedAt),
-    restore: await presign(object, "GET", config, issuedAt),
+    upload: await presign(object, "PUT", config, issuedAt, scope.url_ttl_seconds),
+    head: await presign(object, "HEAD", config, issuedAt, scope.url_ttl_seconds),
+    restore: await presign(object, "GET", config, issuedAt, scope.url_ttl_seconds),
   })));
   return {
-    accession_id: TRANSFER_ACCESSION_ID,
-    video_id: TRANSFER_VIDEO_ID,
+    accession_id: scope.accession_id,
+    video_id: scope.video_id,
     bucket,
-    prefix: TRANSFER_PREFIX,
+    prefix: scope.prefix,
     issued_at: issuedAt.toISOString(),
     expires_at: expiresAt.toISOString(),
     objects: signedObjects,

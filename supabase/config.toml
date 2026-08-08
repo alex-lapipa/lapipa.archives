@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.vimeo-archive-session]
 verify_jwt = false
+
+[functions.vimeo-batch2-session]
+verify_jwt = false
